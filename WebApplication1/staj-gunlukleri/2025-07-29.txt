@@ -1,0 +1,34 @@
+20 Temmuz 2025 - Staj Günlüğü
+
+Bugün Masaj Randevu Sistemi projesinde önemli bir aşama kaydedildi ve backend tarafında tam işlevsel bir API geliştirildi. Aşağıda gün boyunca yapılan çalışmalar detaylı şekilde özetlenmiştir:
+
+1. **API Controller’larının Oluşturulması ve CRUD İşlemleri:**
+   - Service, Therapist, Customer, AvailabilitySlot ve Appointment modelleri için ayrı ayrı API controller dosyaları oluşturuldu.
+   - Her controller’da POST (ekle), GET (listele/detay), PUT (güncelle) ve DELETE (sil) işlemlerini sağlayan endpoint’ler yazıldı.
+   - Kodun doğruluğu ve işlevselliği Postman ile yapılan testlerle doğrulandı.
+
+2. **API Testleri:**
+   - Postman üzerinden tüm ana modeller için POST istekleriyle örnek veriler başarıyla eklendi.
+   - GET istekleriyle eklenen veriler listelendi ve detayları görüntülendi.
+   - PUT istekleriyle kayıtlar güncellendi, DELETE istekleriyle kayıtlar silindi.
+   - Tüm CRUD işlemlerinin sorunsuz çalıştığı doğrulandı.
+
+3. **Model ve API İyileştirmeleri:**
+   - Navigation property’lerde (ör. Appointment ve AvailabilitySlot modellerinde) nullable ayarlamalar yapılarak, sadece ID ile veri gönderildiğinde model binding hatalarının önüne geçildi.
+   - API endpoint’lerinde oluşan 400 ve 404 hatalarının sebepleri analiz edilip, kodda gerekli düzeltmeler yapıldı.
+
+4. **Veritabanı ve İlişkiler:**
+   - Tüm modellerin veritabanı ilişkileri Entity Framework ile doğru şekilde kuruldu.
+   - Migration ve update işlemleriyle veritabanı şeması güncel tutuldu.
+
+5. **Genel Değerlendirme:**
+   - Projenin backend tarafı, modern yazılım standartlarına uygun, esnek ve genişletilebilir bir yapıya kavuştu.
+   - Artık sistemde hizmet, terapist, müşteri, müsaitlik ve randevu kayıtları tam anlamıyla yönetilebiliyor.
+   - API, frontend (React) ile kolayca entegre edilebilecek durumda.
+
+**Sonraki Adımlar:**
+- Frontend tarafında React ile arayüz geliştirmeye başlamak.
+- Randevu çakışma kontrolü ve ek iş kuralları eklemek.
+- API dokümantasyonu için Swagger/OpenAPI desteği eklemek.
+
+Bugün yapılanlar, projenin temelini sağlamlaştırdı ve sonraki aşamalar için güçlü bir zemin oluşturdu. 

@@ -1,0 +1,20 @@
+28 Temmuz 2025 - Staj Günlüğü
+
+Bugün staj projesinin temelleri atıldı ve önemli hazırlıklar yapıldı. Öncelikle, projenin amacı ve kapsamı belirlendi. Masaj Randevu Sistemi adını verdiğimiz bu projede, bir masaj salonunun veya terapistin randevu süreçlerini dijitalleştirmek ve yönetimini kolaylaştırmak hedefleniyor. Hem müşteriler hem de işletme sahipleri için kullanıcı dostu bir platform oluşturulacak.
+
+İlk olarak, proje için yeni bir GitHub repository’si açıldı ve yerel proje bu repoya yüklendi. README dosyası, projenin amacı, hedefleri ve temel gereksinimleriyle detaylı şekilde güncellendi. Projede kullanılacak ana klasör olarak WebApplication1 belirlendi ve gereksiz üst klasörlerin karışıklık yaratmaması sağlandı.
+
+Ardından, projenin backend (sunucu tarafı) kodlamasına başlandı. Sistemde kullanılacak ana veri modelleri oluşturuldu:
+- **Service**: Masaj hizmetlerinin adı, açıklaması, süresi ve fiyatı gibi bilgileri tutar.
+- **Therapist**: Terapistlerin adı ve biyografisi gibi temel bilgileri içerir.
+- **AvailabilitySlot**: Terapistlerin hangi zaman dilimlerinde müsait olduğunu gösterir.
+- **Appointment**: Müşterilerin yaptığı randevu kayıtlarını ve ilgili müşteri bilgilerini tutar.
+
+Bu modeller, Entity Framework Core ile veritabanına bağlanacak şekilde ApplicationDbContext sınıfına eklendi. Gerekli veritabanı bağlantı ayarları yapıldı ve SQL Server ile bağlantı kuruldu. Migration işlemleriyle birlikte veritabanı ve tablolar başarıyla oluşturuldu. Ayrıca, tablolar arası ilişkilerde oluşabilecek "multiple cascade path" hatası uygun şekilde çözüldü.
+
+Şu anda projenin kod tarafında:
+- Proje amacı ve gereksinimleri net şekilde belirlendi ve dokümante edildi.
+- Ana veri modelleri (Service, Therapist, AvailabilitySlot, Appointment) yazıldı.
+- Entity Framework ile veritabanı bağlantısı kuruldu ve migration işlemleri başarıyla tamamlandı.
+
+Bir sonraki adımda, API controller’ları yazılarak temel CRUD işlemlerinin yapılması planlanıyor. 
