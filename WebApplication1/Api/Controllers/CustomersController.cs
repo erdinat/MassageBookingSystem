@@ -16,17 +16,39 @@ namespace WebApplication1.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
+        public async Task<ActionResult<IEnumerable<object>>> GetCustomers()
         {
-            return await _context.Customers.ToListAsync();
+            var customers = await _context.Customers
+                .Select(c => new
+                {
+                    c.Id,
+                    c.Name,
+                    c.Surname,
+                    c.Phone,
+                    c.Email
+                })
+                .ToListAsync();
+            
+            return Ok(customers);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Customer>> GetCustomer(int id)
+        public async Task<ActionResult<object>> GetCustomer(int id)
         {
-            var customer = await _context.Customers.FindAsync(id);
+            var customer = await _context.Customers
+                .Where(c => c.Id == id)
+                .Select(c => new
+                {
+                    c.Id,
+                    c.Name,
+                    c.Surname,
+                    c.Phone,
+                    c.Email
+                })
+                .FirstOrDefaultAsync();
+            
             if (customer == null) return NotFound();
-            return customer;
+            return Ok(customer);
         }
 
         [HttpPost]

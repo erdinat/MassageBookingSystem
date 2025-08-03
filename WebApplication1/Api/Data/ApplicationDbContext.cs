@@ -12,6 +12,8 @@ namespace WebApplication1.Api.Data
         public DbSet<AvailabilitySlot> AvailabilitySlots { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<Customer> Customers { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<UserFavoriteTherapist> UserFavoriteTherapists { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -34,6 +36,24 @@ namespace WebApplication1.Api.Data
                 .WithMany()
                 .HasForeignKey(a => a.CustomerId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // User relationships
+            modelBuilder.Entity<UserFavoriteTherapist>()
+                .HasOne(uft => uft.User)
+                .WithMany(u => u.FavoriteTherapists)
+                .HasForeignKey(uft => uft.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<UserFavoriteTherapist>()
+                .HasOne(uft => uft.Therapist)
+                .WithMany()
+                .HasForeignKey(uft => uft.TherapistId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Email unique constraint
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
         }
     }
 }

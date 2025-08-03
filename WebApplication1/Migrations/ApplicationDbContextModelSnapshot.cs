@@ -45,6 +45,15 @@ namespace WebApplication1.Migrations
                     b.Property<int>("TherapistId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("TherapistId1")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("UserId1")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AvailabilitySlotId");
@@ -54,6 +63,10 @@ namespace WebApplication1.Migrations
                     b.HasIndex("ServiceId");
 
                     b.HasIndex("TherapistId");
+
+                    b.HasIndex("TherapistId1");
+
+                    b.HasIndex("UserId1");
 
                     b.ToTable("Appointments");
                 });
@@ -157,9 +170,96 @@ namespace WebApplication1.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ProfilePictureUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Therapists");
+                });
+
+            modelBuilder.Entity("WebApplication1.Api.Models.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("EmailVerificationToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("EmailVerificationTokenExpiry")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsEmailVerified")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastLoginAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordResetToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("PasswordResetTokenExpiry")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Surname")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("WebApplication1.Api.Models.UserFavoriteTherapist", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TherapistId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TherapistId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserFavoriteTherapists");
                 });
 
             modelBuilder.Entity("WebApplication1.Api.Models.Appointment", b =>
@@ -188,6 +288,14 @@ namespace WebApplication1.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("WebApplication1.Api.Models.Therapist", null)
+                        .WithMany("Appointments")
+                        .HasForeignKey("TherapistId1");
+
+                    b.HasOne("WebApplication1.Api.Models.User", null)
+                        .WithMany("Appointments")
+                        .HasForeignKey("UserId1");
+
                     b.Navigation("AvailabilitySlot");
 
                     b.Navigation("Customer");
@@ -200,12 +308,45 @@ namespace WebApplication1.Migrations
             modelBuilder.Entity("WebApplication1.Api.Models.AvailabilitySlot", b =>
                 {
                     b.HasOne("WebApplication1.Api.Models.Therapist", "Therapist")
-                        .WithMany()
+                        .WithMany("AvailabilitySlots")
                         .HasForeignKey("TherapistId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Therapist");
+                });
+
+            modelBuilder.Entity("WebApplication1.Api.Models.UserFavoriteTherapist", b =>
+                {
+                    b.HasOne("WebApplication1.Api.Models.Therapist", "Therapist")
+                        .WithMany()
+                        .HasForeignKey("TherapistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebApplication1.Api.Models.User", "User")
+                        .WithMany("FavoriteTherapists")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Therapist");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WebApplication1.Api.Models.Therapist", b =>
+                {
+                    b.Navigation("Appointments");
+
+                    b.Navigation("AvailabilitySlots");
+                });
+
+            modelBuilder.Entity("WebApplication1.Api.Models.User", b =>
+                {
+                    b.Navigation("Appointments");
+
+                    b.Navigation("FavoriteTherapists");
                 });
 #pragma warning restore 612, 618
         }

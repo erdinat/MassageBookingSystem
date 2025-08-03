@@ -16,17 +16,54 @@ namespace WebApplication1.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AvailabilitySlot>>> GetSlots()
+        public async Task<ActionResult<IEnumerable<object>>> GetSlots()
         {
-            return await _context.AvailabilitySlots.Include(a => a.Therapist).ToListAsync();
+            var slots = await _context.AvailabilitySlots
+                .Include(a => a.Therapist)
+                .Select(a => new
+                {
+                    a.Id,
+                    a.TherapistId,
+                    a.StartTime,
+                    a.EndTime,
+                    a.IsBooked,
+                    Therapist = new
+                    {
+                        a.Therapist.Id,
+                        a.Therapist.Name,
+                        a.Therapist.Bio,
+                        a.Therapist.ProfilePictureUrl
+                    }
+                })
+                .ToListAsync();
+            
+            return Ok(slots);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<AvailabilitySlot>> GetSlot(int id)
+        public async Task<ActionResult<object>> GetSlot(int id)
         {
-            var slot = await _context.AvailabilitySlots.Include(a => a.Therapist).FirstOrDefaultAsync(a => a.Id == id);
+            var slot = await _context.AvailabilitySlots
+                .Include(a => a.Therapist)
+                .Where(a => a.Id == id)
+                .Select(a => new
+                {
+                    a.Id,
+                    a.TherapistId,
+                    a.StartTime,
+                    a.EndTime,
+                    a.IsBooked,
+                    Therapist = new
+                    {
+                        a.Therapist.Id,
+                        a.Therapist.Name,
+                        a.Therapist.Bio,
+                        a.Therapist.ProfilePictureUrl
+                    }
+                })
+                .FirstOrDefaultAsync();
             if (slot == null) return NotFound();
-            return slot;
+            return Ok(slot);
         }
 
         [HttpPost]

@@ -16,17 +16,39 @@ namespace WebApplication1.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Service>>> GetServices()
+        public async Task<ActionResult<IEnumerable<object>>> GetServices()
         {
-            return await _context.Services.ToListAsync();
+            var services = await _context.Services
+                .Select(s => new
+                {
+                    s.Id,
+                    s.Name,
+                    s.Description,
+                    s.Price,
+                    s.DurationMinutes
+                })
+                .ToListAsync();
+            
+            return Ok(services);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Service>> GetService(int id)
+        public async Task<ActionResult<object>> GetService(int id)
         {
-            var service = await _context.Services.FindAsync(id);
+            var service = await _context.Services
+                .Where(s => s.Id == id)
+                .Select(s => new
+                {
+                    s.Id,
+                    s.Name,
+                    s.Description,
+                    s.Price,
+                    s.DurationMinutes
+                })
+                .FirstOrDefaultAsync();
+            
             if (service == null) return NotFound();
-            return service;
+            return Ok(service);
         }
 
         [HttpPost]
