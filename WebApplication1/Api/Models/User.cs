@@ -1,5 +1,11 @@
 namespace WebApplication1.Api.Models
 {
+    public enum UserRole
+    {
+        Customer = 0,
+        Therapist = 1,
+        Admin = 2
+    }
     public class User
     {
         public int Id { get; set; }
@@ -15,9 +21,11 @@ namespace WebApplication1.Api.Models
         public DateTime? EmailVerificationTokenExpiry { get; set; }
         public string? PasswordResetToken { get; set; }
         public DateTime? PasswordResetTokenExpiry { get; set; }
+        public UserRole Role { get; set; } = UserRole.Customer;
         
         // Navigation properties
         public ICollection<UserFavoriteTherapist> FavoriteTherapists { get; set; } = new List<UserFavoriteTherapist>();
         public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
+        public Therapist? TherapistProfile { get; set; }
     }
 }

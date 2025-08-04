@@ -34,6 +34,7 @@ namespace WebApplication1.Api.DTOs
         public DateTime CreatedAt { get; set; }
         public DateTime? LastLoginAt { get; set; }
         public bool IsEmailVerified { get; set; }
+        public string Role { get; set; } = string.Empty;
         public List<TherapistDto> FavoriteTherapists { get; set; } = new List<TherapistDto>();
     }
 

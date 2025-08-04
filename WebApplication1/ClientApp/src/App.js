@@ -37,6 +37,7 @@ import TherapistsPage from './pages/TherapistsPage';
 import BookingPage from './pages/BookingPage';
 import AppointmentManagementPage from './pages/AppointmentManagementPage';
 import AdminDashboard from './pages/AdminDashboard';
+import TherapistDashboard from './pages/TherapistDashboard';
 import LoginRegisterPage from './pages/LoginRegisterPage';
 import ProfilePage from './pages/ProfilePage';
 
@@ -132,7 +133,16 @@ function App() {
   // Dynamic navigation and user state
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user') || 'null'));
   const isLoggedIn = !!user;
-  const isAdmin = user?.email === 'admin@lor-masaj.com';
+  const isAdmin = user?.role === 'Admin';
+  const isTherapist = user?.role === 'Therapist';
+  const isCustomer = user?.role === 'Customer';
+  
+  // Debug log for troubleshooting
+  console.log('Current user:', user);
+  console.log('User role:', user?.role);
+  console.log('isAdmin:', isAdmin);
+  console.log('isTherapist:', isTherapist);
+  console.log('isCustomer:', isCustomer);
 
   // State for profile menu
   const [anchorEl, setAnchorEl] = useState(null);
@@ -157,15 +167,23 @@ function App() {
 
     if (isLoggedIn) {
       // Logged in user navigation
-      const loggedInItems = [
-        ...baseItems,
-        { label: 'Randevularım', path: '/appointments', icon: TimeIcon },
-        { label: 'Profilim', path: '/profile', icon: AccountIcon }
-      ];
+      const loggedInItems = [...baseItems];
 
-      // Add admin panel for admin users
-      if (isAdmin) {
-        loggedInItems.push({ label: 'Admin', path: '/admin', icon: AdminIcon });
+      if (isCustomer) {
+        loggedInItems.push(
+          { label: 'Randevularım', path: '/appointments', icon: TimeIcon },
+          { label: 'Profilim', path: '/profile', icon: AccountIcon }
+        );
+      } else if (isTherapist) {
+        loggedInItems.push(
+          { label: 'Terapist Paneli', path: '/therapist-dashboard', icon: AdminIcon },
+          { label: 'Profilim', path: '/profile', icon: AccountIcon }
+        );
+      } else if (isAdmin) {
+        loggedInItems.push(
+          { label: 'Admin Paneli', path: '/admin', icon: AdminIcon },
+          { label: 'Profilim', path: '/profile', icon: AccountIcon }
+        );
       }
 
       return loggedInItems;
@@ -179,6 +197,9 @@ function App() {
   };
 
   const navigationItems = getNavigationItems();
+  
+  // Debug navigation items
+  console.log('Navigation items for user:', navigationItems);
 
   // Ana sayfa kontrolü
   const isHomePage = location.pathname === '/';
@@ -360,10 +381,16 @@ function App() {
                         <ListItemIcon><AccountIcon fontSize="small" /></ListItemIcon>
                         Profilim
                       </MenuItem>
-                      {!isAdmin && (
+                      {isCustomer && (
                         <MenuItem onClick={() => handleNavigate('/appointments')}>
                           <ListItemIcon><BookOnlineIcon fontSize="small" /></ListItemIcon>
                           Randevularım
+                        </MenuItem>
+                      )}
+                      {isTherapist && (
+                        <MenuItem onClick={() => handleNavigate('/therapist-dashboard')}>
+                          <ListItemIcon><AdminIcon fontSize="small" /></ListItemIcon>
+                          Terapist Paneli
                         </MenuItem>
                       )}
                       {isAdmin && (
@@ -422,6 +449,11 @@ function App() {
                 <BookingPage />
               </motion.div>
             } />
+            <Route path="/randevu" element={
+              <motion.div style={{ backgroundColor: 'transparent' }} initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
+                <BookingPage />
+              </motion.div>
+            } />
             <Route path="/appointments" element={
               <motion.div style={{ backgroundColor: 'transparent' }} initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
                 <AppointmentManagementPage />
@@ -440,6 +472,11 @@ function App() {
             <Route path="/admin" element={
               <motion.div style={{ backgroundColor: 'transparent' }} initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
                 <AdminDashboard />
+              </motion.div>
+            } />
+            <Route path="/therapist-dashboard" element={
+              <motion.div style={{ backgroundColor: 'transparent' }} initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
+                <TherapistDashboard />
               </motion.div>
             } />
           </Routes>

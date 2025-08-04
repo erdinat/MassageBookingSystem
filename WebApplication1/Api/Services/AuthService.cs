@@ -62,6 +62,17 @@ namespace WebApplication1.Api.Services
                 // Generate email verification token
                 var verificationToken = GenerateRandomToken();
 
+                // Determine user role
+                UserRole userRole = UserRole.Customer; // Default
+                if (request.Email == "admin@lor-masaj.com")
+                {
+                    userRole = UserRole.Admin;
+                }
+                else if (request.Email.EndsWith("@therapist.lor-masaj.com"))
+                {
+                    userRole = UserRole.Therapist;
+                }
+
                 // Create user
                 var user = new User
                 {
@@ -70,6 +81,7 @@ namespace WebApplication1.Api.Services
                     Email = request.Email,
                     Phone = request.Phone,
                     PasswordHash = passwordHash,
+                    Role = userRole,
                     EmailVerificationToken = verificationToken,
                     EmailVerificationTokenExpiry = DateTime.UtcNow.AddDays(1),
                     CreatedAt = DateTime.UtcNow
@@ -77,6 +89,21 @@ namespace WebApplication1.Api.Services
 
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
+
+                // If therapist, create therapist profile
+                if (userRole == UserRole.Therapist)
+                {
+                    var therapistProfile = new Therapist
+                    {
+                        Name = $"{user.Name} {user.Surname}",
+                        Bio = "Deneyimli masaj terapisti", // Default bio
+                        ProfilePictureUrl = "",
+                        UserId = user.Id
+                    };
+                    
+                    _context.Therapists.Add(therapistProfile);
+                    await _context.SaveChangesAsync();
+                }
 
                 // Send verification email (in background)
                 _ = Task.Run(async () =>
@@ -415,6 +442,7 @@ namespace WebApplication1.Api.Services
                 CreatedAt = user.CreatedAt,
                 LastLoginAt = user.LastLoginAt,
                 IsEmailVerified = user.IsEmailVerified,
+                Role = user.Role.ToString(),
                 FavoriteTherapists = user.FavoriteTherapists?.Select(ft => new TherapistDto
                 {
                     Id = ft.Therapist.Id,

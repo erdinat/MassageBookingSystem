@@ -50,6 +50,13 @@ namespace WebApplication1.Api.Data
                 .HasForeignKey(uft => uft.TherapistId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // User-Therapist relationship
+            modelBuilder.Entity<Therapist>()
+                .HasOne(t => t.User)
+                .WithOne(u => u.TherapistProfile)
+                .HasForeignKey<Therapist>(t => t.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
+
             // Email unique constraint
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email)

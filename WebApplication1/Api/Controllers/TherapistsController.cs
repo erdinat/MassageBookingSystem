@@ -18,15 +18,18 @@ namespace WebApplication1.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<object>>> GetTherapists()
         {
-            var therapists = await _context.Therapists
-                .Select(t => new
-                {
-                    t.Id,
-                    t.Name,
-                    t.Bio,
-                    t.ProfilePictureUrl
-                })
-                .ToListAsync();
+                    var therapists = await _context.Therapists
+            .Include(t => t.User)
+            .Select(t => new
+            {
+                t.Id,
+                t.Name,
+                t.Bio,
+                t.ProfilePictureUrl,
+                t.UserId,
+                User = t.User != null ? new { t.User.Id, t.User.Name, t.User.Email } : null
+            })
+            .ToListAsync();
             
             return Ok(therapists);
         }
@@ -34,16 +37,19 @@ namespace WebApplication1.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<object>> GetTherapist(int id)
         {
-            var therapist = await _context.Therapists
-                .Where(t => t.Id == id)
-                .Select(t => new
-                {
-                    t.Id,
-                    t.Name,
-                    t.Bio,
-                    t.ProfilePictureUrl
-                })
-                .FirstOrDefaultAsync();
+                    var therapist = await _context.Therapists
+            .Include(t => t.User)
+            .Where(t => t.Id == id)
+            .Select(t => new
+            {
+                t.Id,
+                t.Name,
+                t.Bio,
+                t.ProfilePictureUrl,
+                t.UserId,
+                User = t.User != null ? new { t.User.Id, t.User.Name, t.User.Email } : null
+            })
+            .FirstOrDefaultAsync();
             
             if (therapist == null) return NotFound();
             return Ok(therapist);

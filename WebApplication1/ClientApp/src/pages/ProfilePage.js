@@ -8,7 +8,7 @@ import {
   Delete as DeleteIcon, AccountCircle as AccountCircleIcon
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-import api from '../services/api';
+// import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
 const pageVariants = {
@@ -28,11 +28,24 @@ const ProfilePage = () => {
   const fetchUserData = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
-      if (!token) {
+      const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+      
+      if (!token || !currentUser.id) {
         navigate('/auth');
         return;
       }
-      const { data } = await api.get('/auth/profile');
+      
+      const response = await fetch(`/api/auth/profile/${currentUser.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      const data = await response.json();
       setUser({
         name: data.name,
         surname: data.surname,
@@ -43,7 +56,7 @@ const ProfilePage = () => {
     } catch (error) {
       console.error('Kullanıcı verileri alınamadı', error);
       setNotification({ open: true, message: 'Kullanıcı verileri alınamadı.', severity: 'error' });
-      if (error.response && error.response.status === 401) {
+      if (error.message.includes('401')) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         navigate('/auth');
@@ -68,7 +81,20 @@ const ProfilePage = () => {
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     try {
-      await api.put('/auth/profile', user);
+      const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+      const response = await fetch(`/api/auth/profile/${currentUser.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(user)
+      });
+      
+      if (!response.ok) {
+        throw new Error('Profil güncellenemedi');
+      }
+      
       setNotification({ open: true, message: 'Profil başarıyla güncellendi!', severity: 'success' });
       setEditMode(false);
       // Update user info in localStorage
@@ -78,7 +104,7 @@ const ProfilePage = () => {
       localStorage.setItem('user', JSON.stringify(localUser));
       window.dispatchEvent(new Event('storage')); // Notify other components of change
     } catch (error) {
-      setNotification({ open: true, message: error.response?.data?.message || 'Profil güncellenemedi.', severity: 'error' });
+      setNotification({ open: true, message: 'Profil güncellenemedi.', severity: 'error' });
     }
   };
 
@@ -89,20 +115,46 @@ const ProfilePage = () => {
       return;
     }
     try {
-      await api.post('/auth/change-password', {
-        oldPassword: passwordData.oldPassword,
-        newPassword: passwordData.newPassword,
+      const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+      const response = await fetch(`/api/auth/change-password/${currentUser.id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          currentPassword: passwordData.oldPassword,
+          newPassword: passwordData.newPassword,
+          confirmNewPassword: passwordData.confirmPassword
+        })
       });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Şifre değiştirilemedi');
+      }
+      
       setNotification({ open: true, message: 'Şifre başarıyla değiştirildi!', severity: 'success' });
       setPasswordData({ oldPassword: '', newPassword: '', confirmPassword: '' });
     } catch (error) {
-      setNotification({ open: true, message: error.response?.data?.message || 'Şifre değiştirilemedi.', severity: 'error' });
+      setNotification({ open: true, message: error.message || 'Şifre değiştirilemedi.', severity: 'error' });
     }
   };
   
   const handleRemoveFavorite = async (therapistId) => {
     try {
-        await api.delete(`/auth/favorites/${therapistId}`);
+        const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+        const response = await fetch(`/api/auth/favorites/${currentUser.id}/remove/${therapistId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error('Favori kaldırılamadı');
+        }
+        
         setNotification({ open: true, message: 'Terapist favorilerden kaldırıldı.', severity: 'success' });
         fetchUserData(); // Refresh list
     } catch (error) {
