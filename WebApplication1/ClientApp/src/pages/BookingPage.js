@@ -41,9 +41,16 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { motion, AnimatePresence } from 'framer-motion';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 import 'dayjs/locale/tr';
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 dayjs.locale('tr');
+
+// Türkiye saati için timezone ayarı
+const TIMEZONE = 'Europe/Istanbul';
 
 const steps = ['Hizmet Onayı', 'Terapist Seçimi', 'Tarih Seçimi', 'Saat Seçimi', 'Bilgileriniz'];
 
@@ -124,11 +131,11 @@ function BookingPage() {
           const response = await fetch('/api/availability');
           const data = await response.json();
           
-          // Filter for selected therapist and date
+          // Filter for selected therapist and date (Türkiye saati ile)
           const filteredSlots = data.filter(slot => 
             slot.therapistId === selectedTherapist.id && 
             !slot.isBooked &&
-            dayjs(slot.startTime).format('YYYY-MM-DD') === selectedDate.format('YYYY-MM-DD')
+            dayjs.utc(slot.startTime).tz(TIMEZONE).format('YYYY-MM-DD') === selectedDate.tz(TIMEZONE).format('YYYY-MM-DD')
           );
           
           setAvailableSlots(filteredSlots);
@@ -204,7 +211,7 @@ function BookingPage() {
             service: service.name,
             therapist: selectedTherapist.name,
             date: selectedDate.format('DD MMMM YYYY'),
-            time: dayjs(selectedSlot.startTime).format('HH:mm')
+            time: dayjs.utc(selectedSlot.startTime).tz(TIMEZONE).format('HH:mm')
           }
         }
       });
@@ -424,7 +431,7 @@ function BookingPage() {
                         <CardContent sx={{ py: 2 }}>
                           <ClockIcon sx={{ fontSize: 24, mb: 1 }} />
                           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                            {dayjs(slot.startTime).format('HH:mm')}
+                            {dayjs.utc(slot.startTime).tz(TIMEZONE).format('HH:mm')}
                           </Typography>
                         </CardContent>
                       </Card>
@@ -592,7 +599,7 @@ function BookingPage() {
                     </ListItemAvatar>
                     <ListItemText 
                       primary="Tarih & Saat" 
-                      secondary={`${selectedDate?.format('DD MMMM YYYY')} - ${selectedSlot ? dayjs(selectedSlot.startTime).format('HH:mm') : ''}`} 
+                      secondary={`${selectedDate?.tz(TIMEZONE).format('DD MMMM YYYY')} - ${selectedSlot ? dayjs.utc(selectedSlot.startTime).tz(TIMEZONE).format('HH:mm') : ''}`} 
                     />
                   </ListItem>
                   <ListItem>

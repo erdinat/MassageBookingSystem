@@ -47,10 +47,17 @@ import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 import 'dayjs/locale/tr';
 
-// Set dayjs locale to Turkish
+// Timezone ve locale ayarları
+dayjs.extend(utc);
+dayjs.extend(timezone);
 dayjs.locale('tr');
+
+// Türkiye saati için timezone ayarı
+const TIMEZONE = 'Europe/Istanbul';
 
 function TherapistDashboard() {
   const [currentTab, setCurrentTab] = useState(0);
@@ -165,20 +172,40 @@ function TherapistDashboard() {
   };
 
   const fetchStats = async () => {
-    // This would be implemented with specific API endpoints
-    // For now, calculate from existing data
-    const today = dayjs().format('YYYY-MM-DD');
+    // Türkiye saati ile tarih karşılaştırması
+    const today = dayjs().tz(TIMEZONE).format('YYYY-MM-DD');
     const todayAppointments = appointments.filter(a => 
-      dayjs(a.availabilitySlot?.startTime).format('YYYY-MM-DD') === today
+      dayjs(a.availabilitySlot?.startTime).tz(TIMEZONE).format('YYYY-MM-DD') === today
     ).length;
+
+    // Gerçek gelir hesaplama - servis fiyatlarını kullanarak
+    const weeklyRevenue = appointments
+      .filter(a => {
+        const appointmentDate = dayjs(a.availabilitySlot?.startTime).tz(TIMEZONE);
+        const weekAgo = dayjs().tz(TIMEZONE).subtract(7, 'day');
+        return appointmentDate.isAfter(weekAgo);
+      })
+      .reduce((total, appointment) => {
+        return total + (appointment.service?.price || 0);
+      }, 0);
+
+    // Sonraki randevu - Türkiye saati ile
+    const nextAppointment = appointments.find(a => 
+      dayjs(a.availabilitySlot?.startTime).tz(TIMEZONE).isAfter(dayjs().tz(TIMEZONE))
+    );
+
+    console.log('Stats calculation:', { 
+      totalAppointments: appointments.length, 
+      todayAppointments, 
+      weeklyRevenue,
+      nextAppointment 
+    });
 
     setStats({
       totalAppointments: appointments.length,
       todayAppointments: todayAppointments,
-      weeklyRevenue: appointments.length * 250, // Estimated
-      nextAppointment: appointments.find(a => 
-        dayjs(a.availabilitySlot?.startTime).isAfter(dayjs())
-      )
+      weeklyRevenue: weeklyRevenue,
+      nextAppointment: nextAppointment
     });
   };
 
@@ -229,13 +256,39 @@ function TherapistDashboard() {
 
   const handleAvailabilitySave = async () => {
     try {
+      // Tarih ve saati Türkiye saati ile birleştir
+      const selectedDate = dayjs(availabilityForm.date).tz(TIMEZONE);
+      const startTime = dayjs(availabilityForm.startTime);
+      const endTime = dayjs(availabilityForm.endTime);
+      
+      // Tarih + saat birleştirme (Türkiye saati)
+      const startDateTime = selectedDate
+        .hour(startTime.hour())
+        .minute(startTime.minute())
+        .second(0)
+        .millisecond(0)
+        .tz(TIMEZONE);
+        
+      const endDateTime = selectedDate
+        .hour(endTime.hour())
+        .minute(endTime.minute())
+        .second(0)
+        .millisecond(0)
+        .tz(TIMEZONE);
+
+      console.log('Frontend - Start DateTime (Turkey):', startDateTime.format());
+      console.log('Frontend - End DateTime (Turkey):', endDateTime.format());
+      console.log('Frontend - Start DateTime (UTC):', startDateTime.utc().toISOString());
+      console.log('Frontend - End DateTime (UTC):', endDateTime.utc().toISOString());
+
       const availabilityData = {
         therapistId: therapistProfile.id,
-        date: dayjs(availabilityForm.date).format('YYYY-MM-DD'),
-        startTime: dayjs(availabilityForm.startTime).format('HH:mm:ss'),
-        endTime: dayjs(availabilityForm.endTime).format('HH:mm:ss'),
+        startTime: startDateTime.utc().toISOString(), // UTC olarak gönder
+        endTime: endDateTime.utc().toISOString(),     // UTC olarak gönder
         isBooked: false
       };
+
+      console.log('Sending availability data:', availabilityData);
 
       const response = await fetch('/api/availability', {
         method: 'POST',
@@ -244,6 +297,7 @@ function TherapistDashboard() {
       });
 
       if (response.ok) {
+        console.log('Availability saved successfully');
         fetchAvailabilitySlots();
         setAvailabilityDialog(false);
         showNotification('Müsaitlik başarıyla eklendi!', 'success');
@@ -253,9 +307,14 @@ function TherapistDashboard() {
           endTime: null,
           isBooked: false
         });
+      } else {
+        const errorData = await response.text();
+        console.error('API Error:', errorData);
+        showNotification('Müsaitlik eklenirken hata oluştu: ' + errorData, 'error');
       }
     } catch (error) {
-      showNotification('Müsaitlik eklenirken hata oluştu!', 'error');
+      console.error('Frontend Error:', error);
+      showNotification('Müsaitlik eklenirken hata oluştu: ' + error.message, 'error');
     }
   };
 
@@ -264,11 +323,26 @@ function TherapistDashboard() {
   };
 
   const formatDate = (dateString) => {
-    return dayjs(dateString).format('DD/MM/YYYY');
+    const result = dayjs(dateString).tz(TIMEZONE).format('DD/MM/YYYY');
+    console.log('formatDate Debug:', { input: dateString, output: result, timezone: TIMEZONE });
+    return result;
   };
 
   const formatTime = (timeString) => {
-    return dayjs(timeString, 'HH:mm:ss').format('HH:mm');
+    // UTC olarak parse edip Türkiye saatine çevir
+    const utcTime = dayjs.utc(timeString);
+    const turkeyTime = utcTime.tz(TIMEZONE);
+    const result = turkeyTime.format('HH:mm');
+    
+    console.log('formatTime Debug:', { 
+      input: timeString, 
+      utcTime: utcTime.format(), 
+      turkeyTime: turkeyTime.format(), 
+      output: result,
+      timezone: TIMEZONE 
+    });
+    
+    return result;
   };
 
   // Tab Panel Component
@@ -292,57 +366,150 @@ function TherapistDashboard() {
         </Box>
 
         {/* Stats Cards */}
-        <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid container spacing={4} sx={{ mb: 4 }}>
+          {/* Toplam Randevu */}
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: 'linear-gradient(135deg, #8B6F47 0%, #A0845C 100%)', color: 'white' }}>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <EventIcon sx={{ fontSize: 40, mr: 2 }} />
-                  <Box>
-                    <Typography variant="h4" component="div">{stats.totalAppointments}</Typography>
-                    <Typography variant="body2">Toplam Randevu</Typography>
-                  </Box>
+            <Card sx={{ 
+              background: 'linear-gradient(145deg, #8B6F47 0%, #6B5437 100%)', 
+              color: 'white',
+              height: '140px',
+              boxShadow: '0 8px 32px rgba(139, 111, 71, 0.3)',
+              transition: 'all 0.3s ease-in-out',
+              '&:hover': {
+                transform: 'translateY(-8px)',
+                boxShadow: '0 16px 48px rgba(139, 111, 71, 0.4)'
+              }
+            }}>
+              <CardContent sx={{ height: '100%', display: 'flex', alignItems: 'center', p: 3 }}>
+                <Box sx={{ 
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)', 
+                  borderRadius: '50%', 
+                  p: 2, 
+                  mr: 3,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <EventIcon sx={{ fontSize: 32, color: 'white' }} />
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="h3" component="div" sx={{ fontWeight: 'bold', mb: 0.5 }}>
+                    {stats.totalAppointments}
+                  </Typography>
+                  <Typography variant="body2" sx={{ opacity: 0.9, fontSize: '0.9rem' }}>
+                    Toplam Randevu
+                  </Typography>
                 </Box>
               </CardContent>
             </Card>
           </Grid>
+
+          {/* Bugünkü Randevu */}
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: 'linear-gradient(135deg, #D4B896 0%, #E8D4B0 100%)' }}>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <ScheduleIcon sx={{ fontSize: 40, mr: 2, color: '#8B6F47' }} />
-                  <Box>
-                    <Typography variant="h4" component="div" sx={{ color: '#8B6F47' }}>{stats.todayAppointments}</Typography>
-                    <Typography variant="body2" sx={{ color: '#8B6F47' }}>Bugünkü Randevu</Typography>
-                  </Box>
+            <Card sx={{ 
+              background: 'linear-gradient(145deg, #FF6B6B 0%, #EE5A52 100%)', 
+              color: 'white',
+              height: '140px',
+              boxShadow: '0 8px 32px rgba(255, 107, 107, 0.3)',
+              transition: 'all 0.3s ease-in-out',
+              '&:hover': {
+                transform: 'translateY(-8px)',
+                boxShadow: '0 16px 48px rgba(255, 107, 107, 0.4)'
+              }
+            }}>
+              <CardContent sx={{ height: '100%', display: 'flex', alignItems: 'center', p: 3 }}>
+                <Box sx={{ 
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)', 
+                  borderRadius: '50%', 
+                  p: 2, 
+                  mr: 3,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <ScheduleIcon sx={{ fontSize: 32, color: 'white' }} />
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="h3" component="div" sx={{ fontWeight: 'bold', mb: 0.5 }}>
+                    {stats.todayAppointments}
+                  </Typography>
+                  <Typography variant="body2" sx={{ opacity: 0.9, fontSize: '0.9rem' }}>
+                    Bugünkü Randevu
+                  </Typography>
                 </Box>
               </CardContent>
             </Card>
           </Grid>
+
+          {/* Haftalık Gelir */}
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ background: 'linear-gradient(135deg, #F5F1E8 0%, #FFFFFF 100%)' }}>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <StatsIcon sx={{ fontSize: 40, mr: 2, color: '#8B6F47' }} />
-                  <Box>
-                    <Typography variant="h4" component="div" sx={{ color: '#8B6F47' }}>₺{stats.weeklyRevenue}</Typography>
-                    <Typography variant="body2" sx={{ color: '#8B6F47' }}>Haftalık Gelir</Typography>
-                  </Box>
+            <Card sx={{ 
+              background: 'linear-gradient(145deg, #4ECDC4 0%, #44A08D 100%)', 
+              color: 'white',
+              height: '140px',
+              boxShadow: '0 8px 32px rgba(78, 205, 196, 0.3)',
+              transition: 'all 0.3s ease-in-out',
+              '&:hover': {
+                transform: 'translateY(-8px)',
+                boxShadow: '0 16px 48px rgba(78, 205, 196, 0.4)'
+              }
+            }}>
+              <CardContent sx={{ height: '100%', display: 'flex', alignItems: 'center', p: 3 }}>
+                <Box sx={{ 
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)', 
+                  borderRadius: '50%', 
+                  p: 2, 
+                  mr: 3,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <StatsIcon sx={{ fontSize: 32, color: 'white' }} />
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="h3" component="div" sx={{ fontWeight: 'bold', mb: 0.5, fontSize: '1.8rem' }}>
+                    ₺{stats.weeklyRevenue?.toLocaleString('tr-TR') || '0'}
+                  </Typography>
+                  <Typography variant="body2" sx={{ opacity: 0.9, fontSize: '0.9rem' }}>
+                    Haftalık Gelir
+                  </Typography>
                 </Box>
               </CardContent>
             </Card>
           </Grid>
+
+          {/* Sonraki Randevu */}
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ border: '2px solid #8B6F47' }}>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <DashboardIcon sx={{ fontSize: 40, mr: 2, color: '#8B6F47' }} />
-                  <Box>
-                    <Typography variant="h6" component="div" sx={{ color: '#8B6F47' }}>
-                      {stats.nextAppointment ? formatTime(stats.nextAppointment.appointmentDate) : 'Yok'}
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: '#8B6F47' }}>Sonraki Randevu</Typography>
-                  </Box>
+            <Card sx={{ 
+              background: 'linear-gradient(145deg, #667eea 0%, #764ba2 100%)', 
+              color: 'white',
+              height: '140px',
+              boxShadow: '0 8px 32px rgba(102, 126, 234, 0.3)',
+              transition: 'all 0.3s ease-in-out',
+              '&:hover': {
+                transform: 'translateY(-8px)',
+                boxShadow: '0 16px 48px rgba(102, 126, 234, 0.4)'
+              }
+            }}>
+              <CardContent sx={{ height: '100%', display: 'flex', alignItems: 'center', p: 3 }}>
+                <Box sx={{ 
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)', 
+                  borderRadius: '50%', 
+                  p: 2, 
+                  mr: 3,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <DashboardIcon sx={{ fontSize: 32, color: 'white' }} />
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="h3" component="div" sx={{ fontWeight: 'bold', mb: 0.5, fontSize: '1.8rem' }}>
+                    {stats.nextAppointment ? formatTime(stats.nextAppointment.availabilitySlot?.startTime) : 'Yok'}
+                  </Typography>
+                  <Typography variant="body2" sx={{ opacity: 0.9, fontSize: '0.9rem' }}>
+                    Sonraki Randevu
+                  </Typography>
                 </Box>
               </CardContent>
             </Card>
