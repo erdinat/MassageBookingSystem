@@ -121,6 +121,10 @@ function AdminDashboard() {
     loadAvailability();
   }, []);
 
+  const showSnackbar = useCallback((message, severity = 'success') => {
+    setSnackbar({ open: true, message, severity });
+  }, []);
+
   const loadDashboardData = useCallback(async () => {
     try {
       const [appointmentsRes, servicesRes, therapistsRes] = await Promise.all([
@@ -454,10 +458,6 @@ function AdminDashboard() {
     setAvailabilityDialog({ open: false, slot: null });
     setAvailabilityForm({ therapistId: '', startTime: null, endTime: null, isBooked: false });
   };
-
-  const showSnackbar = useCallback((message, severity = 'success') => {
-    setSnackbar({ open: true, message, severity });
-  }, []);
 
   const DashboardStats = () => (
     <Grid container spacing={3}>
