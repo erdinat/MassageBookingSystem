@@ -284,6 +284,175 @@ namespace WebApplication1.Api.Controllers
             });
         }
 
+        [HttpPost("reset-test-password")]
+        public async Task<IActionResult> ResetTestPassword()
+        {
+            try
+            {
+                var testUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == "test@test.com");
+                if (testUser != null)
+                {
+                    // Simple password hash for testing - same logic as AuthService
+                    using var sha256 = System.Security.Cryptography.SHA256.Create();
+                    var hashedBytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes("test"));
+                    testUser.PasswordHash = Convert.ToBase64String(hashedBytes);
+                    
+                    await _context.SaveChangesAsync();
+                    
+                    return Ok(new { 
+                        message = "Test kullanıcısının şifresi 'test' olarak sıfırlandı",
+                        email = "test@test.com",
+                        password = "test",
+                        role = "Customer"
+                    });
+                }
+                
+                return BadRequest("Test kullanıcısı bulunamadı");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Hata: {ex.Message}");
+            }
+        }
+
+        [HttpPost("seed-database")]
+        public async Task<IActionResult> SeedDatabase()
+        {
+            try
+            {
+                // Admin kullanıcısı oluştur
+                var adminUser = new Models.User
+                {
+                    Name = "Admin",
+                    Surname = "User",
+                    Email = "admin@lor-masaj.com",
+                    Phone = "5551234567",
+                    Role = Models.UserRole.Admin,
+                    CreatedAt = DateTime.UtcNow,
+                    IsEmailVerified = true
+                };
+                
+                using var sha256 = System.Security.Cryptography.SHA256.Create();
+                var hashedBytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes("123456"));
+                adminUser.PasswordHash = Convert.ToBase64String(hashedBytes);
+                
+                _context.Users.Add(adminUser);
+                await _context.SaveChangesAsync();
+                
+                // Terapist kullanıcısı oluştur
+                var therapistUser = new Models.User
+                {
+                    Name = "Altyngul",
+                    Surname = "Therapist",
+                    Email = "altyngul@therapist.lor-masaj.com",
+                    Phone = "5551234568",
+                    Role = Models.UserRole.Therapist,
+                    CreatedAt = DateTime.UtcNow,
+                    IsEmailVerified = true
+                };
+                
+                var therapistHashedBytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes("123456"));
+                therapistUser.PasswordHash = Convert.ToBase64String(therapistHashedBytes);
+                
+                _context.Users.Add(therapistUser);
+                await _context.SaveChangesAsync();
+                
+                // Terapist profili oluştur
+                var therapist = new Models.Therapist
+                {
+                    Name = "Altyngul",
+                    Bio = "Deneyimli masaj terapisti",
+                    ProfilePictureUrl = "/images/therapists/therapist1.jpg",
+                    UserId = therapistUser.Id
+                };
+                
+                _context.Therapists.Add(therapist);
+                await _context.SaveChangesAsync();
+                
+                // Müşteri oluştur
+                var customer = new Models.Customer
+                {
+                    Name = "Test",
+                    Surname = "Customer",
+                    Phone = "5551234569",
+                    Email = "test@test.com"
+                };
+                
+                _context.Customers.Add(customer);
+                await _context.SaveChangesAsync();
+                
+                // Hizmetler oluştur
+                var services = new List<Models.Service>
+                {
+                    new Models.Service
+                    {
+                        Name = "Klasik Masaj",
+                        Description = "Geleneksel masaj tekniği ile rahatlama",
+                        Price = 200,
+                        DurationMinutes = 60
+                    },
+                    new Models.Service
+                    {
+                        Name = "Aromaterapi Masajı",
+                        Description = "Esansiyel yağlar ile derin rahatlama",
+                        Price = 250,
+                        DurationMinutes = 75
+                    },
+                    new Models.Service
+                    {
+                        Name = "Spor Masajı",
+                        Description = "Kas gevşetme ve toparlanma",
+                        Price = 300,
+                        DurationMinutes = 90
+                    },
+                    new Models.Service
+                    {
+                        Name = "Refleksoloji",
+                        Description = "Ayak masajı ile enerji akışı",
+                        Price = 180,
+                        DurationMinutes = 45
+                    }
+                };
+                
+                _context.Services.AddRange(services);
+                await _context.SaveChangesAsync();
+                
+                // Müsaitlik slotları oluştur
+                var availabilitySlots = new List<Models.AvailabilitySlot>();
+                var startDate = DateTime.Today.AddDays(1);
+                
+                for (int day = 0; day < 7; day++)
+                {
+                    var currentDate = startDate.AddDays(day);
+                    for (int hour = 9; hour <= 17; hour++)
+                    {
+                        availabilitySlots.Add(new Models.AvailabilitySlot
+                        {
+                            StartTime = currentDate.AddHours(hour),
+                            EndTime = currentDate.AddHours(hour + 1),
+                            IsBooked = false
+                        });
+                    }
+                }
+                
+                _context.AvailabilitySlots.AddRange(availabilitySlots);
+                await _context.SaveChangesAsync();
+                
+                return Ok(new { 
+                    message = "Veritabanı başarıyla dolduruldu!",
+                    admin = new { email = "admin@lor-masaj.com", password = "123456" },
+                    therapist = new { email = "altyngul@therapist.lor-masaj.com", password = "123456" },
+                    customer = new { email = "test@test.com" },
+                    services = services.Count,
+                    availabilitySlots = availabilitySlots.Count
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Hata: {ex.Message}");
+            }
+        }
+
         [HttpPost("create-admin")]
         public IActionResult CreateAdmin()
         {

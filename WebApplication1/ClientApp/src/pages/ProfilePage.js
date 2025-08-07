@@ -29,7 +29,19 @@ const ProfilePage = () => {
       const token = localStorage.getItem('token');
       const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
       
+      console.log('Current user from localStorage:', currentUser);
+      console.log('User ID:', currentUser.id);
+      
       if (!token || !currentUser.id) {
+        navigate('/auth');
+        return;
+      }
+      
+      // Eğer user ID 3 ise ve veritabanında yoksa, localStorage'ı temizle
+      if (currentUser.id === 3) {
+        console.log('Invalid user ID detected, clearing localStorage...');
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
         navigate('/auth');
         return;
       }

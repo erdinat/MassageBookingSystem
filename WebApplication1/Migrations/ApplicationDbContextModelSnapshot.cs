@@ -48,10 +48,7 @@ namespace WebApplication1.Migrations
                     b.Property<int?>("TherapistId1")
                         .HasColumnType("int");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("UserId1")
+                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -66,7 +63,7 @@ namespace WebApplication1.Migrations
 
                     b.HasIndex("TherapistId1");
 
-                    b.HasIndex("UserId1");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Appointments");
                 });
@@ -147,7 +144,8 @@ namespace WebApplication1.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
 
                     b.HasKey("Id");
 
@@ -246,38 +244,12 @@ namespace WebApplication1.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("WebApplication1.Api.Models.UserFavoriteTherapist", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("TherapistId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TherapistId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserFavoriteTherapists");
-                });
-
             modelBuilder.Entity("WebApplication1.Api.Models.Appointment", b =>
                 {
                     b.HasOne("WebApplication1.Api.Models.AvailabilitySlot", "AvailabilitySlot")
                         .WithMany()
                         .HasForeignKey("AvailabilitySlotId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("WebApplication1.Api.Models.Customer", "Customer")
@@ -304,7 +276,7 @@ namespace WebApplication1.Migrations
 
                     b.HasOne("WebApplication1.Api.Models.User", null)
                         .WithMany("Appointments")
-                        .HasForeignKey("UserId1");
+                        .HasForeignKey("UserId");
 
                     b.Navigation("AvailabilitySlot");
 
@@ -336,25 +308,6 @@ namespace WebApplication1.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("WebApplication1.Api.Models.UserFavoriteTherapist", b =>
-                {
-                    b.HasOne("WebApplication1.Api.Models.Therapist", "Therapist")
-                        .WithMany()
-                        .HasForeignKey("TherapistId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WebApplication1.Api.Models.User", "User")
-                        .WithMany("FavoriteTherapists")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Therapist");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("WebApplication1.Api.Models.Therapist", b =>
                 {
                     b.Navigation("Appointments");
@@ -365,8 +318,6 @@ namespace WebApplication1.Migrations
             modelBuilder.Entity("WebApplication1.Api.Models.User", b =>
                 {
                     b.Navigation("Appointments");
-
-                    b.Navigation("FavoriteTherapists");
 
                     b.Navigation("TherapistProfile");
                 });

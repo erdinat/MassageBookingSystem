@@ -69,7 +69,7 @@ function ServicesPage() {
       </Box>
 
       <Container sx={{ mt: 6, mb: 4 }}>
-        <Grid container spacing={4} alignItems="stretch">
+        <Grid container spacing={3} sx={{ justifyContent: 'center' }}>
           {services.length === 0 ? (
             <Grid item xs={12}>
               <Card sx={{ 
@@ -111,9 +111,9 @@ function ServicesPage() {
             </Grid>
           ) : (
             services.map((service) => (
-              <Grid item xs={12} md={6} lg={4} key={service.id} sx={{ display: 'flex' }}>
+              <Grid item xs={12} sm={6} md={4} lg={3} key={service.id}>
                 <Card sx={{ 
-                  width: '100%',
+                  height: '320px', // SABİT YÜKSEKLİK
                   display: 'flex',
                   flexDirection: 'column',
                   '&:hover': { 
@@ -125,22 +125,40 @@ function ServicesPage() {
                   transition: 'all 0.3s ease',
                   borderRadius: 2
                 }}>
-                  <CardContent sx={{ flexGrow: 1 }}>
+                  <CardContent sx={{ 
+                    flexGrow: 1, 
+                    display: 'flex', 
+                    flexDirection: 'column',
+                    p: 2
+                  }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      <SpaIcon sx={{ color: '#8B6F47', mr: 1, fontSize: '2rem' }} />
-                      <Typography variant="h5" sx={{ color: '#8B6F47', fontWeight: 'bold' }}>
+                      <SpaIcon sx={{ color: '#8B6F47', mr: 1, fontSize: '1.5rem' }} />
+                      <Typography variant="h6" sx={{ color: '#8B6F47', fontWeight: 'bold' }}>
                         {service.name}
                       </Typography>
                     </Box>
                     
-                    <Typography variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.6 }}>
+                    <Typography 
+                      variant="body2" 
+                      color="text.secondary" 
+                      sx={{ 
+                        lineHeight: 1.5, 
+                        flexGrow: 1,
+                        mb: 2,
+                        overflow: 'hidden',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: 'vertical'
+                      }}
+                    >
                       {service.description}
                     </Typography>
 
                     <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
                       <Chip 
                         icon={<TimeIcon />} 
-                        label={`${service.durationMinutes} dakika`} 
+                        label={`${service.durationMinutes} dk`} 
+                        size="small"
                         sx={{ 
                           backgroundColor: '#D4B896', 
                           color: '#8B6F47',
@@ -151,6 +169,7 @@ function ServicesPage() {
                       <Chip 
                         icon={<PriceIcon />} 
                         label={`₺${service.price}`} 
+                        size="small"
                         sx={{ 
                           backgroundColor: '#8B6F47', 
                           color: '#F5F1E8',
@@ -161,19 +180,19 @@ function ServicesPage() {
                     </Box>
                   </CardContent>
                   
-                  <CardActions sx={{ p: 2, pt: 0 }}>
+                  <CardActions sx={{ p: 2, pt: 0, mt: 'auto' }}>
                     <Button
                       component={RouterLink}
                       to={`/booking/${service.id}`}
                       variant="contained"
                       fullWidth
-                      size="large"
+                      size="medium"
                       startIcon={<BookIcon />}
                       sx={{
                         backgroundColor: '#8B6F47',
                         color: '#F5F1E8',
-                        py: 1.5,
-                        fontSize: '1rem',
+                        py: 1,
+                        fontSize: '0.9rem',
                         fontWeight: 'bold',
                         '&:hover': {
                           backgroundColor: '#6B5437',

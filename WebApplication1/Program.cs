@@ -2,6 +2,9 @@ using WebApplication1.Api.Data;
 using WebApplication1.Api.Services;
 using Microsoft.EntityFrameworkCore;
 
+// Türkiye saat dilimini ayarla
+AppContext.SetSwitch("System.Globalization.InvariantGlobalization", false);
+
 var builder = WebApplication.CreateBuilder(args);
 
 // DbContext servisini ekle

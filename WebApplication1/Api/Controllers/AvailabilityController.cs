@@ -24,8 +24,8 @@ namespace WebApplication1.Api.Controllers
                 {
                     a.Id,
                     a.TherapistId,
-                    a.StartTime,
-                    a.EndTime,
+                    StartTime = a.StartTime.ToLocalTime(), // Türkiye saatine çevir
+                    EndTime = a.EndTime.ToLocalTime(), // Türkiye saatine çevir
                     a.IsBooked,
                     Therapist = new
                     {
@@ -50,8 +50,8 @@ namespace WebApplication1.Api.Controllers
                 {
                     a.Id,
                     a.TherapistId,
-                    a.StartTime,
-                    a.EndTime,
+                    StartTime = a.StartTime.ToLocalTime(), // Türkiye saatine çevir
+                    EndTime = a.EndTime.ToLocalTime(), // Türkiye saatine çevir
                     a.IsBooked,
                     Therapist = new
                     {
@@ -69,6 +69,11 @@ namespace WebApplication1.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<AvailabilitySlot>> CreateSlot(AvailabilitySlot slot)
         {
+            // Türkiye saatini UTC'ye çevir
+            var turkeyTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Turkey Standard Time");
+            slot.StartTime = TimeZoneInfo.ConvertTimeToUtc(slot.StartTime, turkeyTimeZone);
+            slot.EndTime = TimeZoneInfo.ConvertTimeToUtc(slot.EndTime, turkeyTimeZone);
+            
             _context.AvailabilitySlots.Add(slot);
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetSlot), new { id = slot.Id }, slot);
@@ -78,6 +83,12 @@ namespace WebApplication1.Api.Controllers
         public async Task<IActionResult> UpdateSlot(int id, AvailabilitySlot slot)
         {
             if (id != slot.Id) return BadRequest();
+            
+            // Türkiye saatini UTC'ye çevir
+            var turkeyTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Turkey Standard Time");
+            slot.StartTime = TimeZoneInfo.ConvertTimeToUtc(slot.StartTime, turkeyTimeZone);
+            slot.EndTime = TimeZoneInfo.ConvertTimeToUtc(slot.EndTime, turkeyTimeZone);
+            
             _context.Entry(slot).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return NoContent();

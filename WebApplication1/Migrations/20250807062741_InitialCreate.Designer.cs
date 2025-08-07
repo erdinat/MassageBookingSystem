@@ -12,8 +12,8 @@ using WebApplication1.Api.Data;
 namespace WebApplication1.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250801224919_AddTherapistProfilePicture")]
-    partial class AddTherapistProfilePicture
+    [Migration("20250807062741_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -147,7 +147,8 @@ namespace WebApplication1.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
 
                     b.HasKey("Id");
 
@@ -174,7 +175,14 @@ namespace WebApplication1.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("Therapists");
                 });
@@ -224,6 +232,9 @@ namespace WebApplication1.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
+
                     b.Property<string>("Surname")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -236,38 +247,12 @@ namespace WebApplication1.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("WebApplication1.Api.Models.UserFavoriteTherapist", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("TherapistId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TherapistId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserFavoriteTherapists");
-                });
-
             modelBuilder.Entity("WebApplication1.Api.Models.Appointment", b =>
                 {
                     b.HasOne("WebApplication1.Api.Models.AvailabilitySlot", "AvailabilitySlot")
                         .WithMany()
                         .HasForeignKey("AvailabilitySlotId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("WebApplication1.Api.Models.Customer", "Customer")
@@ -316,21 +301,12 @@ namespace WebApplication1.Migrations
                     b.Navigation("Therapist");
                 });
 
-            modelBuilder.Entity("WebApplication1.Api.Models.UserFavoriteTherapist", b =>
+            modelBuilder.Entity("WebApplication1.Api.Models.Therapist", b =>
                 {
-                    b.HasOne("WebApplication1.Api.Models.Therapist", "Therapist")
-                        .WithMany()
-                        .HasForeignKey("TherapistId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("WebApplication1.Api.Models.User", "User")
-                        .WithMany("FavoriteTherapists")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Therapist");
+                        .WithOne("TherapistProfile")
+                        .HasForeignKey("WebApplication1.Api.Models.Therapist", "UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("User");
                 });
@@ -346,7 +322,7 @@ namespace WebApplication1.Migrations
                 {
                     b.Navigation("Appointments");
 
-                    b.Navigation("FavoriteTherapists");
+                    b.Navigation("TherapistProfile");
                 });
 #pragma warning restore 612, 618
         }
