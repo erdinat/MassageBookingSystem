@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Container,
   Typography,
@@ -119,9 +119,9 @@ function AdminDashboard() {
     loadServices();
     loadTherapists();
     loadAvailability();
-  }, [loadDashboardData, loadAppointments, loadServices, loadTherapists, loadAvailability]);
+  }, []);
 
-  const loadDashboardData = async () => {
+  const loadDashboardData = useCallback(async () => {
     try {
       const [appointmentsRes, servicesRes, therapistsRes] = await Promise.all([
         fetch('/api/appointments'),
@@ -152,9 +152,9 @@ function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [showSnackbar]);
 
-  const loadAppointments = async () => {
+  const loadAppointments = useCallback(async () => {
     try {
       const response = await fetch('/api/appointments');
       if (response.ok) {
@@ -164,9 +164,9 @@ function AdminDashboard() {
     } catch (error) {
       console.error('Randevular yüklenirken hata:', error);
     }
-  };
+  }, []);
 
-  const loadServices = async () => {
+  const loadServices = useCallback(async () => {
     try {
       const response = await fetch('/api/services');
       if (response.ok) {
@@ -176,9 +176,9 @@ function AdminDashboard() {
     } catch (error) {
       console.error('Hizmetler yüklenirken hata:', error);
     }
-  };
+  }, []);
 
-  const loadTherapists = async () => {
+  const loadTherapists = useCallback(async () => {
     try {
       const response = await fetch('/api/therapists');
       if (response.ok) {
@@ -188,9 +188,9 @@ function AdminDashboard() {
     } catch (error) {
       console.error('Terapistler yüklenirken hata:', error);
     }
-  };
+  }, []);
 
-  const loadAvailability = async () => {
+  const loadAvailability = useCallback(async () => {
     try {
       const response = await fetch('/api/availability');
       if (response.ok) {
@@ -200,7 +200,7 @@ function AdminDashboard() {
     } catch (error) {
       console.error('Müsaitlik verileri yüklenirken hata:', error);
     }
-  };
+  }, []);
 
   const handleSaveService = async () => {
     try {
@@ -455,9 +455,9 @@ function AdminDashboard() {
     setAvailabilityForm({ therapistId: '', startTime: null, endTime: null, isBooked: false });
   };
 
-  const showSnackbar = (message, severity = 'success') => {
+  const showSnackbar = useCallback((message, severity = 'success') => {
     setSnackbar({ open: true, message, severity });
-  };
+  }, []);
 
   const DashboardStats = () => (
     <Grid container spacing={3}>
