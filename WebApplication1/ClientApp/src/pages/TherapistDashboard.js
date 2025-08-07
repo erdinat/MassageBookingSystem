@@ -694,27 +694,33 @@ function TherapistDashboard() {
         <Dialog open={availabilityDialog} onClose={() => setAvailabilityDialog(false)} maxWidth="sm" fullWidth>
           <DialogTitle>Yeni Müsaitlik Ekle</DialogTitle>
           <DialogContent>
-            <Box sx={{ mt: 2 }}>
-              <DatePicker
-                label="Tarih"
-                value={availabilityForm.date}
-                onChange={(newValue) => setAvailabilityForm({ ...availabilityForm, date: newValue })}
-                renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
-                minDate={dayjs()}
-              />
-              <TimePicker
-                label="Başlangıç Saati"
-                value={availabilityForm.startTime}
-                onChange={(newValue) => setAvailabilityForm({ ...availabilityForm, startTime: newValue })}
-                renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
-              />
-              <TimePicker
-                label="Bitiş Saati"
-                value={availabilityForm.endTime}
-                onChange={(newValue) => setAvailabilityForm({ ...availabilityForm, endTime: newValue })}
-                renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
-              />
-            </Box>
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              <Grid item xs={12}>
+                <DatePicker
+                  label="Tarih"
+                  value={availabilityForm.date}
+                  onChange={(newValue) => setAvailabilityForm({ ...availabilityForm, date: newValue })}
+                  renderInput={(params) => <TextField {...params} fullWidth />}
+                  minDate={dayjs()}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TimePicker
+                  label="Başlangıç Saati"
+                  value={availabilityForm.startTime}
+                  onChange={(newValue) => setAvailabilityForm({ ...availabilityForm, startTime: newValue })}
+                  renderInput={(params) => <TextField {...params} fullWidth />}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TimePicker
+                  label="Bitiş Saati"
+                  value={availabilityForm.endTime}
+                  onChange={(newValue) => setAvailabilityForm({ ...availabilityForm, endTime: newValue })}
+                  renderInput={(params) => <TextField {...params} fullWidth />}
+                />
+              </Grid>
+            </Grid>
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setAvailabilityDialog(false)} startIcon={<CancelIcon />}>İptal</Button>

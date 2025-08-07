@@ -34,6 +34,7 @@ namespace WebApplication1.Api.Controllers
                     a.Id,
                     a.CreatedAt,
                     a.UserId,
+                    a.TherapistId,
                     Service = new
                     {
                         a.Service.Id,
@@ -86,7 +87,7 @@ namespace WebApplication1.Api.Controllers
         }
 
         [HttpGet("customer/{email}/upcoming")]
-        public async Task<ActionResult<IEnumerable<Appointment>>> GetUpcomingAppointmentsByCustomerEmail(string email)
+        public async Task<ActionResult<IEnumerable<object>>> GetUpcomingAppointmentsByCustomerEmail(string email)
         {
             var appointments = await _context.Appointments
                 .Include(a => a.Service)
@@ -95,13 +96,50 @@ namespace WebApplication1.Api.Controllers
                 .Include(a => a.AvailabilitySlot)
                 .Where(a => a.Customer.Email == email && a.AvailabilitySlot.StartTime > DateTime.Now)
                 .OrderBy(a => a.AvailabilitySlot.StartTime)
+                .Select(a => new
+                {
+                    a.Id,
+                    a.CreatedAt,
+                    a.UserId,
+                    a.TherapistId,
+                    Service = new
+                    {
+                        a.Service.Id,
+                        a.Service.Name,
+                        a.Service.Description,
+                        a.Service.Price,
+                        a.Service.DurationMinutes
+                    },
+                    Therapist = new
+                    {
+                        a.Therapist.Id,
+                        a.Therapist.Name,
+                        a.Therapist.Bio,
+                        a.Therapist.ProfilePictureUrl
+                    },
+                    Customer = new
+                    {
+                        a.Customer.Id,
+                        a.Customer.Name,
+                        a.Customer.Surname,
+                        a.Customer.Phone,
+                        a.Customer.Email
+                    },
+                    AvailabilitySlot = new
+                    {
+                        a.AvailabilitySlot.Id,
+                        a.AvailabilitySlot.StartTime,
+                        a.AvailabilitySlot.EndTime,
+                        a.AvailabilitySlot.IsBooked
+                    }
+                })
                 .ToListAsync();
 
-            return appointments;
+            return Ok(appointments);
         }
 
         [HttpGet("customer/{email}/past")]
-        public async Task<ActionResult<IEnumerable<Appointment>>> GetPastAppointmentsByCustomerEmail(string email)
+        public async Task<ActionResult<IEnumerable<object>>> GetPastAppointmentsByCustomerEmail(string email)
         {
             var appointments = await _context.Appointments
                 .Include(a => a.Service)
@@ -110,9 +148,46 @@ namespace WebApplication1.Api.Controllers
                 .Include(a => a.AvailabilitySlot)
                 .Where(a => a.Customer.Email == email && a.AvailabilitySlot.StartTime <= DateTime.Now)
                 .OrderByDescending(a => a.AvailabilitySlot.StartTime)
+                .Select(a => new
+                {
+                    a.Id,
+                    a.CreatedAt,
+                    a.UserId,
+                    a.TherapistId,
+                    Service = new
+                    {
+                        a.Service.Id,
+                        a.Service.Name,
+                        a.Service.Description,
+                        a.Service.Price,
+                        a.Service.DurationMinutes
+                    },
+                    Therapist = new
+                    {
+                        a.Therapist.Id,
+                        a.Therapist.Name,
+                        a.Therapist.Bio,
+                        a.Therapist.ProfilePictureUrl
+                    },
+                    Customer = new
+                    {
+                        a.Customer.Id,
+                        a.Customer.Name,
+                        a.Customer.Surname,
+                        a.Customer.Phone,
+                        a.Customer.Email
+                    },
+                    AvailabilitySlot = new
+                    {
+                        a.AvailabilitySlot.Id,
+                        a.AvailabilitySlot.StartTime,
+                        a.AvailabilitySlot.EndTime,
+                        a.AvailabilitySlot.IsBooked
+                    }
+                })
                 .ToListAsync();
 
-            return appointments;
+            return Ok(appointments);
         }
 
         [HttpGet("{id}")]
@@ -133,7 +208,12 @@ namespace WebApplication1.Api.Controllers
         {
             try
             {
-                appointment.CreatedAt = DateTime.UtcNow;
+                // Türkiye saati için CreatedAt
+                var turkeyTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Turkey Standard Time"));
+                appointment.CreatedAt = turkeyTime;
+                
+                Console.WriteLine($"Appointment Creation Debug - UTC: {DateTime.UtcNow}, Turkey Time: {turkeyTime}, Set CreatedAt: {appointment.CreatedAt}");
+                
                 _context.Appointments.Add(appointment);
                 await _context.SaveChangesAsync();
 

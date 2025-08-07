@@ -1,0 +1,130 @@
+STAJ DEFTERİ - 6 AĞUSTOS 2025
+
+TARİH: 06.08.2025
+ÇALIŞMA SAATİ: 09:00 - 17:00
+TOPLAM ÇALIŞMA SAATİ: 8 saat
+
+BUGÜN YAPILAN ÇALIŞMALAR:
+
+1. RANDEVU GÜNCELLEME SİSTEMİNİN GELİŞTİRİLMESİ
+   - Randevu güncelleme dialog'u oluşturuldu
+   - openRescheduleDialog fonksiyonu geliştirildi
+   - handleReschedule fonksiyonu ile randevu güncelleme işlemi eklendi
+   - Terapist değiştirme özelliği eklendi
+   - Tarih ve saat değiştirme özelliği eklendi
+   - Güncelleme sonrası otomatik yenileme eklendi
+
+2. MÜŞTERİ RANDEVU YÖNETİMİ SİSTEMİNİN GELİŞTİRİLMESİ
+   - AppointmentManagementPage.js sayfası geliştirildi
+   - Müşteri randevularını görüntüleme özelliği eklendi
+   - Randevu iptal etme özelliği eklendi
+   - Randevu güncelleme özelliği eklendi
+   - Randevu durumu (yaklaşan/tamamlanan) gösterimi eklendi
+   - Randevu kartları tasarımı yapıldı
+
+3. BACKEND SORUNLARININ ÇÖZÜLMESİ
+   - CORS (Cross-Origin Resource Sharing) yapılandırması eklendi
+   - Program.cs dosyasına CORS middleware'i eklendi
+   - Backend API'nin frontend ile iletişim kurması sağlandı
+
+4. VERİTABANI İLİŞKİLERİNİN DÜZELTİLMESİ
+   - Foreign key constraint sorunları çözüldü
+   - Cascade delete davranışları DeleteBehavior.Restrict olarak değiştirildi
+   - ApplicationDbContext.cs dosyasında appointment ilişkileri düzeltildi
+   - Yeni migration oluşturuldu: "FixAppointmentRelationships"
+
+5. FRONTEND HATALARININ ÇÖZÜLMESİ
+   - Randevu güncelleme dialog'unda toString() hatası düzeltildi
+   - AppointmentManagementPage.js dosyasında undefined değer kontrolleri eklendi
+   - openRescheduleDialog fonksiyonunda therapistId kontrolü eklendi
+   - handleReschedule fonksiyonunda güvenli kontroller eklendi
+   - AppointmentCard bileşeninde null/undefined değer kontrolleri eklendi
+
+6. API ENDPOINT'LERİNİN İYİLEŞTİRİLMESİ
+   - AppointmentsController.cs dosyasında therapistId alanı eklendi
+   - GetAppointments metoduna therapistId alanı eklendi
+   - GetUpcomingAppointmentsByCustomerEmail metoduna therapistId alanı eklendi
+   - GetPastAppointmentsByCustomerEmail metoduna therapistId alanı eklendi
+   - Reschedule endpoint'i geliştirildi
+
+7. BACKEND PORT YAPILANDIRMASI
+   - Backend port 5058'de çalışacak şekilde yapılandırıldı
+   - React uygulaması proxy ayarı ile backend'e bağlandı
+   - launchSettings.json dosyası kontrol edildi
+
+TEKNİK DETAYLAR:
+
+Randevu Güncelleme Sistemi:
+- openRescheduleDialog: Randevu güncelleme dialog'unu açar
+- handleReschedule: Randevu güncelleme işlemini gerçekleştirir
+- Terapist değiştirme özelliği eklendi
+- Tarih ve saat değiştirme özelliği eklendi
+- Güncelleme sonrası otomatik yenileme
+
+Müşteri Randevu Yönetimi:
+- AppointmentManagementPage.js: Ana randevu yönetim sayfası
+- AppointmentCard: Randevu kartı bileşeni
+- Randevu iptal etme fonksiyonu
+- Randevu durumu gösterimi (yaklaşan/tamamlanan)
+- Email ile randevu arama özelliği
+
+Backend Değişiklikleri:
+- Program.cs: CORS yapılandırması eklendi
+- ApplicationDbContext.cs: Foreign key ilişkileri düzeltildi
+- AppointmentsController.cs: therapistId alanı API response'larına eklendi
+- Reschedule endpoint'i geliştirildi
+
+Frontend Değişiklikleri:
+- AppointmentManagementPage.js: Undefined değer kontrolleri eklendi
+- Güvenli string dönüşümleri için null kontrolleri eklendi
+- AppointmentCard bileşeninde optional chaining kullanıldı
+- Randevu güncelleme dialog'u tasarlandı
+- Randevu kartları tasarımı yapıldı
+
+Veritabanı Değişiklikleri:
+- Yeni migration: "FixAppointmentRelationships"
+- Foreign key constraint'ler düzeltildi
+- Cascade delete davranışları güvenli hale getirildi
+
+KARŞILAŞILAN SORUNLAR VE ÇÖZÜMLER:
+
+1. SORUN: "Cannot read properties of undefined (reading 'toString')" hatası
+   ÇÖZÜM: Frontend'de undefined değer kontrolleri eklendi
+
+2. SORUN: Foreign key constraint hatası
+   ÇÖZÜM: Cascade delete davranışları Restrict olarak değiştirildi
+
+3. SORUN: CORS hatası
+   ÇÖZÜM: Backend'e CORS yapılandırması eklendi
+
+4. SORUN: API'de therapistId alanı eksik
+   ÇÖZÜM: Controller'larda therapistId alanı response'lara eklendi
+
+5. SORUN: Randevu güncelleme dialog'unda hata
+   ÇÖZÜM: openRescheduleDialog ve handleReschedule fonksiyonları düzeltildi
+
+6. SORUN: Randevu kartlarında undefined değerler
+   ÇÖZÜM: AppointmentCard bileşeninde optional chaining kullanıldı
+
+ÖĞRENİLEN KONULAR:
+- CORS yapılandırması ve önemi
+- Entity Framework Core'da foreign key ilişkileri
+- React'ta undefined değer kontrolleri
+- API response'larında eksik alanların tespiti ve düzeltilmesi
+- Migration'ların doğru kullanımı
+- Randevu yönetimi sisteminin geliştirilmesi
+- Dialog bileşenlerinin tasarımı
+- Randevu güncelleme işlemlerinin implementasyonu
+- Müşteri randevu yönetimi arayüzü tasarımı
+- Optional chaining kullanımı
+
+YARIN YAPILACAKLAR:
+- Kullanıcı arayüzü iyileştirmeleri
+- Performans optimizasyonları
+- Test senaryolarının yazılması
+- Dokümantasyon güncellemesi
+
+NOTLAR:
+- Backend ve frontend arasındaki iletişim sorunları çözüldü
+- Randevu yönetimi sistemi artık stabil çalışıyor
+- Veritabanı ilişkileri güvenli hale getirildi

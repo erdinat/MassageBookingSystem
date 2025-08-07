@@ -19,16 +19,48 @@ namespace WebApplication1.Api.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Appointment>()
-                .HasOne(a => a.Therapist)
-                .WithMany()
-                .HasForeignKey(a => a.TherapistId)
+            // Service configuration
+            modelBuilder.Entity<Service>()
+                .Property(s => s.Price)
+                .HasPrecision(10, 2);
+
+            // User relationships
+            modelBuilder.Entity<UserFavoriteTherapist>()
+                .HasOne(uft => uft.User)
+                .WithMany(u => u.FavoriteTherapists)
+                .HasForeignKey(uft => uft.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<UserFavoriteTherapist>()
+                .HasOne(uft => uft.Therapist)
+                .WithMany()
+                .HasForeignKey(uft => uft.TherapistId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // User-Therapist relationship
+            modelBuilder.Entity<Therapist>()
+                .HasOne(t => t.User)
+                .WithOne(u => u.TherapistProfile)
+                .HasForeignKey<Therapist>(t => t.UserId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // Email unique constraint
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
+
+            // Appointment relationships with Restrict delete behavior
             modelBuilder.Entity<Appointment>()
                 .HasOne(a => a.Service)
                 .WithMany()
                 .HasForeignKey(a => a.ServiceId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.Therapist)
+                .WithMany()
+                .HasForeignKey(a => a.TherapistId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Appointment>()
@@ -37,30 +69,11 @@ namespace WebApplication1.Api.Data
                 .HasForeignKey(a => a.CustomerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // User relationships
-            modelBuilder.Entity<UserFavoriteTherapist>()
-                .HasOne(uft => uft.User)
-                .WithMany(u => u.FavoriteTherapists)
-                .HasForeignKey(uft => uft.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<UserFavoriteTherapist>()
-                .HasOne(uft => uft.Therapist)
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.AvailabilitySlot)
                 .WithMany()
-                .HasForeignKey(uft => uft.TherapistId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            // User-Therapist relationship
-            modelBuilder.Entity<Therapist>()
-                .HasOne(t => t.User)
-                .WithOne(u => u.TherapistProfile)
-                .HasForeignKey<Therapist>(t => t.UserId)
-                .OnDelete(DeleteBehavior.SetNull);
-
-            // Email unique constraint
-            modelBuilder.Entity<User>()
-                .HasIndex(u => u.Email)
-                .IsUnique();
+                .HasForeignKey(a => a.AvailabilitySlotId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

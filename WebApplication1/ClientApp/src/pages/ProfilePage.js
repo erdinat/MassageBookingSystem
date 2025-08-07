@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Container, Box, Typography, TextField, Button, Grid, Paper, Snackbar, Alert,
-  Divider, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton, Tooltip, Avatar, Card, CardContent
+  Divider, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton, Tooltip, Avatar
 } from '@mui/material';
 import {
   Edit as EditIcon, Save as SaveIcon, Lock as LockIcon, Favorite as FavoriteIcon,
   Delete as DeleteIcon, AccountCircle as AccountCircleIcon
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-// import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
 const pageVariants = {

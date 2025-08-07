@@ -19,10 +19,24 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 // Controller servislerini ekle
 builder.Services.AddControllers();
 
+// CORS ekle
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 var app = builder.Build();
 
 // React build klasörü
 var buildPath = Path.Combine(app.Environment.ContentRootPath, "ClientApp", "build");
+
+// CORS middleware ekle
+app.UseCors("AllowAll");
 
 // Önce default static files (wwwroot)
 app.UseStaticFiles();

@@ -178,7 +178,7 @@ function AppointmentManagementPage() {
       open: true,
       appointment: appointment
     });
-    setSelectedTherapist(appointment.therapistId.toString());
+    setSelectedTherapist(appointment.therapistId ? appointment.therapistId.toString() : '');
     setSelectedDate(null);
     setSelectedSlot('');
     setAvailableSlots([]);
@@ -206,7 +206,7 @@ function AppointmentManagementPage() {
         },
         body: JSON.stringify({
           newAvailabilitySlotId: parseInt(selectedSlot),
-          newTherapistId: selectedTherapist !== rescheduleDialog.appointment.therapistId.toString() 
+          newTherapistId: selectedTherapist !== (rescheduleDialog.appointment.therapistId ? rescheduleDialog.appointment.therapistId.toString() : '') 
             ? parseInt(selectedTherapist) 
             : null
         })
@@ -257,8 +257,8 @@ function AppointmentManagementPage() {
   };
 
   const AppointmentCard = ({ appointment, showActions = true }) => {
-    const appointmentDate = dayjs(appointment.availabilitySlot.startTime);
-    const isUpcoming = appointmentDate.isAfter(dayjs());
+    const appointmentDate = appointment.availabilitySlot?.startTime ? dayjs(appointment.availabilitySlot.startTime) : null;
+    const isUpcoming = appointmentDate ? appointmentDate.isAfter(dayjs()) : false;
     
     return (
       <motion.div
@@ -282,7 +282,7 @@ function AppointmentManagementPage() {
           <CardContent>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
               <Typography variant="h6" sx={{ color: '#8B6F47', fontWeight: 'bold' }}>
-                {appointment.service.name}
+                {appointment.service?.name || 'Hizmet belirtilmemiş'}
               </Typography>
               <Chip 
                 icon={isUpcoming ? <CalendarIcon /> : <CompletedIcon />}
@@ -306,7 +306,7 @@ function AppointmentManagementPage() {
                     </ListItemAvatar>
                     <ListItemText 
                       primary="Tarih"
-                      secondary={appointmentDate.format('DD MMMM YYYY')}
+                      secondary={appointmentDate ? appointmentDate.format('DD MMMM YYYY') : 'Tarih belirtilmemiş'}
                     />
                   </ListItem>
                   <ListItem disablePadding>
@@ -317,7 +317,7 @@ function AppointmentManagementPage() {
                     </ListItemAvatar>
                     <ListItemText 
                       primary="Saat"
-                      secondary={appointmentDate.format('HH:mm')}
+                      secondary={appointmentDate ? appointmentDate.format('HH:mm') : 'Saat belirtilmemiş'}
                     />
                   </ListItem>
                 </List>
@@ -332,7 +332,7 @@ function AppointmentManagementPage() {
                     </ListItemAvatar>
                     <ListItemText 
                       primary="Terapist"
-                      secondary={appointment.therapist.name}
+                      secondary={appointment.therapist?.name || 'Terapist belirtilmemiş'}
                     />
                   </ListItem>
                   <ListItem disablePadding>
@@ -343,7 +343,7 @@ function AppointmentManagementPage() {
                     </ListItemAvatar>
                     <ListItemText 
                       primary="Ücret"
-                      secondary={`₺${appointment.service.price}`}
+                      secondary={`₺${appointment.service?.price || 0}`}
                     />
                   </ListItem>
                 </List>
@@ -390,7 +390,16 @@ function AppointmentManagementPage() {
     );
   };
 
-  if (!emailEntered) {
+  if (isLoggedIn && !emailEntered) {
+    // If logged in, don't ask for email, just load data
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
+        <CircularProgress sx={{ color: '#8B6F47' }} />
+      </Box>
+    );
+  }
+
+  if (!isLoggedIn && !emailEntered) {
     return (
       <Box sx={{ minHeight: '100vh', backgroundColor: 'rgba(245, 241, 232, 0.3)', py: 4 }}>
         <Container maxWidth="sm">

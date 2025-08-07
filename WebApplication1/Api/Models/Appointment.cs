@@ -13,7 +13,7 @@ namespace WebApplication1.Api.Models
         public AvailabilitySlot? AvailabilitySlot { get; set; }
         public int CustomerId { get; set; }
         public Customer? Customer { get; set; }
-        public string? UserId { get; set; }
+        public int? UserId { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

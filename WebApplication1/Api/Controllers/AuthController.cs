@@ -243,12 +243,12 @@ namespace WebApplication1.Api.Controllers
             {
                 var result = await _authService.AddFavoriteTherapistAsync(userId, therapistId);
                 
-                if (result)
+                if (result.Success)
                 {
-                    return Ok(new { message = "Terapist favorilere eklendi" });
+                    return Ok(new { message = result.Message });
                 }
                 
-                return BadRequest(new { message = "Favorilere eklenirken hata oluştu" });
+                return BadRequest(new { message = result.Message });
             }
             catch (Exception ex)
             {
@@ -264,12 +264,12 @@ namespace WebApplication1.Api.Controllers
             {
                 var result = await _authService.RemoveFavoriteTherapistAsync(userId, therapistId);
                 
-                if (result)
+                if (result.Success)
                 {
-                    return Ok(new { message = "Terapist favorilerden çıkarıldı" });
+                    return Ok(new { message = result.Message });
                 }
                 
-                return BadRequest(new { message = "Favorilerden çıkarılırken hata oluştu" });
+                return BadRequest(new { message = result.Message });
             }
             catch (Exception ex)
             {
@@ -279,17 +279,17 @@ namespace WebApplication1.Api.Controllers
         }
 
         [HttpGet("favorites/{userId}")]
-        public async Task<ActionResult<List<TherapistDto>>> GetFavoriteTherapists(int userId)
+        public async Task<ActionResult<AuthResponse>> GetFavoriteTherapists(int userId)
         {
             try
             {
-                var favorites = await _authService.GetFavoriteTherapistsAsync(userId);
-                return Ok(favorites);
+                var result = await _authService.GetFavoriteTherapistsAsync(userId);
+                return Ok(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting favorite therapists");
-                return StatusCode(500, new { message = "Sunucu hatası" });
+                return StatusCode(500, new AuthResponse { Success = false, Message = "Sunucu hatası" });
             }
         }
     }

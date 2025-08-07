@@ -174,6 +174,9 @@ function BookingPage() {
     try {
       setLoading(true);
       
+      // Get current user from localStorage  
+      const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+      
       // Create customer
       const customerResponse = await fetch('/api/customers', {
         method: 'POST',
@@ -183,12 +186,15 @@ function BookingPage() {
       const customer = await customerResponse.json();
 
       // Create appointment
-    const appointmentData = {
-      serviceId: parseInt(serviceId),
+      const appointmentData = {
+        serviceId: parseInt(serviceId),
         therapistId: selectedTherapist.id,
         availabilitySlotId: selectedSlot.id,
         customerId: customer.id,
+        userId: currentUser.id ? parseInt(currentUser.id) : null, // UserId ekle
       };
+
+      console.log('Creating appointment with data:', appointmentData);
 
       await fetch('/api/appointments', {
         method: 'POST',
@@ -598,8 +604,22 @@ function BookingPage() {
                       </Avatar>
                     </ListItemAvatar>
                     <ListItemText 
-                      primary="Tarih & Saat" 
-                      secondary={`${selectedDate?.tz(TIMEZONE).format('DD MMMM YYYY')} - ${selectedSlot ? dayjs.utc(selectedSlot.startTime).tz(TIMEZONE).format('HH:mm') : ''}`} 
+                      primary="Tarih" 
+                      secondary={selectedDate?.tz(TIMEZONE).format('DD MMMM YYYY')} 
+                    />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemAvatar>
+                      <Avatar sx={{ backgroundColor: '#8B6F47' }}>
+                        <ClockIcon />
+                      </Avatar>
+                    </ListItemAvatar>
+                    <ListItemText 
+                      primary="Saat" 
+                      secondary={selectedSlot ? 
+                        `${dayjs.utc(selectedSlot.startTime).tz(TIMEZONE).format('HH:mm')} - ${dayjs.utc(selectedSlot.endTime).tz(TIMEZONE).format('HH:mm')}` 
+                        : ''
+                      } 
                     />
                   </ListItem>
                   <ListItem>

@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Security.Cryptography;
 using System.Text;
 using WebApplication1.Api.Data;
-using WebApplication1.Api.Models;
 using WebApplication1.Api.DTOs;
+using WebApplication1.Api.Models;
 
 namespace WebApplication1.Api.Services
 {
@@ -16,9 +17,9 @@ namespace WebApplication1.Api.Services
         Task<AuthResponse> ForgotPasswordAsync(ForgotPasswordRequest request);
         Task<AuthResponse> ResetPasswordAsync(ResetPasswordRequest request);
         Task<UserDto?> GetUserProfileAsync(int userId);
-        Task<bool> AddFavoriteTherapistAsync(int userId, int therapistId);
-        Task<bool> RemoveFavoriteTherapistAsync(int userId, int therapistId);
-        Task<List<TherapistDto>> GetFavoriteTherapistsAsync(int userId);
+        Task<AuthResponse> AddFavoriteTherapistAsync(int userId, int therapistId);
+        Task<AuthResponse> RemoveFavoriteTherapistAsync(int userId, int therapistId);
+        Task<AuthResponse> GetFavoriteTherapistsAsync(int userId);
     }
 
     public class AuthService : IAuthService
@@ -38,99 +39,49 @@ namespace WebApplication1.Api.Services
         {
             try
             {
-                // Validation
-                if (request.Password != request.ConfirmPassword)
+                // Email kontrolü
+                if (await _context.Users.AnyAsync(u => u.Email == request.Email))
                 {
-                    return new AuthResponse { Success = false, Message = "Şifreler eşleşmiyor" };
+                    return new AuthResponse { Success = false, Message = "Bu email adresi zaten kullanılıyor." };
                 }
 
-                if (request.Password.Length < 6)
-                {
-                    return new AuthResponse { Success = false, Message = "Şifre en az 6 karakter olmalıdır" };
-                }
-
-                // Check if user already exists
-                var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-                if (existingUser != null)
-                {
-                    return new AuthResponse { Success = false, Message = "Bu email adresi zaten kullanılıyor" };
-                }
-
-                // Hash password
-                var passwordHash = HashPassword(request.Password);
-
-                // Generate email verification token
-                var verificationToken = GenerateRandomToken();
-
-                // Determine user role
-                UserRole userRole = UserRole.Customer; // Default
-                if (request.Email == "admin@lor-masaj.com")
-                {
-                    userRole = UserRole.Admin;
-                }
-                else if (request.Email.EndsWith("@therapist.lor-masaj.com"))
-                {
-                    userRole = UserRole.Therapist;
-                }
-
-                // Create user
+                // Yeni kullanıcı oluştur
                 var user = new User
                 {
                     Name = request.Name,
                     Surname = request.Surname,
                     Email = request.Email,
                     Phone = request.Phone,
-                    PasswordHash = passwordHash,
-                    Role = userRole,
-                    EmailVerificationToken = verificationToken,
-                    EmailVerificationTokenExpiry = DateTime.UtcNow.AddDays(1),
-                    CreatedAt = DateTime.UtcNow
+                    PasswordHash = HashPassword(request.Password),
+                    Role = UserRole.Customer,
+                    CreatedAt = DateTime.UtcNow,
+                    IsEmailVerified = false
                 };
 
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
 
-                // If therapist, create therapist profile
-                if (userRole == UserRole.Therapist)
-                {
-                    var therapistProfile = new Therapist
-                    {
-                        Name = $"{user.Name} {user.Surname}",
-                        Bio = "Deneyimli masaj terapisti", // Default bio
-                        ProfilePictureUrl = "",
-                        UserId = user.Id
-                    };
-                    
-                    _context.Therapists.Add(therapistProfile);
-                    await _context.SaveChangesAsync();
-                }
+                // Email doğrulama token'ı oluştur
+                var verificationToken = GenerateRandomToken();
+                user.EmailVerificationToken = verificationToken;
+                user.EmailVerificationTokenExpiry = DateTime.UtcNow.AddHours(24);
+                await _context.SaveChangesAsync();
 
-                // Send verification email (in background)
-                _ = Task.Run(async () =>
-                {
-                    try
-                    {
-                        await SendVerificationEmailAsync(user.Email, user.Name, verificationToken);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Email verification could not be sent to {Email}", user.Email);
-                    }
-                });
+                // Doğrulama emaili gönder
+                await SendVerificationEmailAsync(user.Email, user.Name, verificationToken);
 
-                var userDto = MapToUserDto(user);
                 return new AuthResponse
                 {
                     Success = true,
-                    Message = "Kayıt başarılı! Email adresinize doğrulama linki gönderildi.",
-                    User = userDto,
-                    Token = GenerateJwtToken(user) // You would implement JWT token generation
+                    Message = "Kayıt başarılı! Email adresinizi doğrulamak için email'inizi kontrol edin.",
+                    User = MapToUserDto(user),
+                    Token = GenerateJwtToken(user)
                 };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during user registration");
-                return new AuthResponse { Success = false, Message = "Kayıt sırasında bir hata oluştu" };
+                _logger.LogError(ex, "Kayıt sırasında hata oluştu");
+                return new AuthResponse { Success = false, Message = "Kayıt sırasında bir hata oluştu." };
             }
         }
 
@@ -140,31 +91,30 @@ namespace WebApplication1.Api.Services
             {
                 var user = await _context.Users
                     .Include(u => u.FavoriteTherapists)
-                    .ThenInclude(ft => ft.Therapist)
+                    .ThenInclude(uft => uft.Therapist)
                     .FirstOrDefaultAsync(u => u.Email == request.Email);
 
                 if (user == null || !VerifyPassword(request.Password, user.PasswordHash))
                 {
-                    return new AuthResponse { Success = false, Message = "Email veya şifre hatalı" };
+                    return new AuthResponse { Success = false, Message = "Email veya şifre hatalı." };
                 }
 
-                // Update last login
+                // Son giriş zamanını güncelle
                 user.LastLoginAt = DateTime.UtcNow;
                 await _context.SaveChangesAsync();
 
-                var userDto = MapToUserDto(user);
                 return new AuthResponse
                 {
                     Success = true,
-                    Message = "Giriş başarılı",
-                    User = userDto,
+                    Message = "Giriş başarılı!",
+                    User = MapToUserDto(user),
                     Token = GenerateJwtToken(user)
                 };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during user login");
-                return new AuthResponse { Success = false, Message = "Giriş sırasında bir hata oluştu" };
+                _logger.LogError(ex, "Giriş sırasında hata oluştu");
+                return new AuthResponse { Success = false, Message = "Giriş sırasında bir hata oluştu." };
             }
         }
 
@@ -172,36 +122,36 @@ namespace WebApplication1.Api.Services
         {
             try
             {
-                if (request.NewPassword != request.ConfirmNewPassword)
-                {
-                    return new AuthResponse { Success = false, Message = "Yeni şifreler eşleşmiyor" };
-                }
-
-                if (request.NewPassword.Length < 6)
-                {
-                    return new AuthResponse { Success = false, Message = "Yeni şifre en az 6 karakter olmalıdır" };
-                }
-
                 var user = await _context.Users.FindAsync(userId);
                 if (user == null)
                 {
-                    return new AuthResponse { Success = false, Message = "Kullanıcı bulunamadı" };
+                    return new AuthResponse { Success = false, Message = "Kullanıcı bulunamadı." };
                 }
 
                 if (!VerifyPassword(request.CurrentPassword, user.PasswordHash))
                 {
-                    return new AuthResponse { Success = false, Message = "Mevcut şifre hatalı" };
+                    return new AuthResponse { Success = false, Message = "Mevcut şifre hatalı." };
+                }
+
+                if (request.NewPassword != request.ConfirmNewPassword)
+                {
+                    return new AuthResponse { Success = false, Message = "Yeni şifreler eşleşmiyor." };
                 }
 
                 user.PasswordHash = HashPassword(request.NewPassword);
                 await _context.SaveChangesAsync();
 
-                return new AuthResponse { Success = true, Message = "Şifre başarıyla değiştirildi" };
+                return new AuthResponse
+                {
+                    Success = true,
+                    Message = "Şifre başarıyla değiştirildi.",
+                    User = MapToUserDto(user)
+                };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during password change for user {UserId}", userId);
-                return new AuthResponse { Success = false, Message = "Şifre değiştirme sırasında bir hata oluştu" };
+                _logger.LogError(ex, "Şifre değiştirme sırasında hata oluştu");
+                return new AuthResponse { Success = false, Message = "Şifre değiştirme sırasında bir hata oluştu." };
             }
         }
 
@@ -212,27 +162,25 @@ namespace WebApplication1.Api.Services
                 var user = await _context.Users.FindAsync(userId);
                 if (user == null)
                 {
-                    return new AuthResponse { Success = false, Message = "Kullanıcı bulunamadı" };
+                    return new AuthResponse { Success = false, Message = "Kullanıcı bulunamadı." };
                 }
 
                 user.Name = request.Name;
                 user.Surname = request.Surname;
                 user.Phone = request.Phone;
-
                 await _context.SaveChangesAsync();
 
-                var userDto = MapToUserDto(user);
                 return new AuthResponse
                 {
                     Success = true,
-                    Message = "Profil başarıyla güncellendi",
-                    User = userDto
+                    Message = "Profil başarıyla güncellendi.",
+                    User = MapToUserDto(user)
                 };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during profile update for user {UserId}", userId);
-                return new AuthResponse { Success = false, Message = "Profil güncellenirken bir hata oluştu" };
+                _logger.LogError(ex, "Profil güncelleme sırasında hata oluştu");
+                return new AuthResponse { Success = false, Message = "Profil güncelleme sırasında bir hata oluştu." };
             }
         }
 
@@ -243,35 +191,26 @@ namespace WebApplication1.Api.Services
                 var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
                 if (user == null)
                 {
-                    // Don't reveal if email exists for security
-                    return new AuthResponse { Success = true, Message = "Eğer bu email adresi sistemde kayıtlıysa, şifre sıfırlama linki gönderilmiştir." };
+                    return new AuthResponse { Success = false, Message = "Bu email adresi ile kayıtlı kullanıcı bulunamadı." };
                 }
 
                 var resetToken = GenerateRandomToken();
                 user.PasswordResetToken = resetToken;
                 user.PasswordResetTokenExpiry = DateTime.UtcNow.AddHours(1);
-
                 await _context.SaveChangesAsync();
 
-                // Send reset email (in background)
-                _ = Task.Run(async () =>
-                {
-                    try
-                    {
-                        await SendPasswordResetEmailAsync(user.Email, user.Name, resetToken);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Password reset email could not be sent to {Email}", user.Email);
-                    }
-                });
+                await SendPasswordResetEmailAsync(user.Email, user.Name, resetToken);
 
-                return new AuthResponse { Success = true, Message = "Eğer bu email adresi sistemde kayıtlıysa, şifre sıfırlama linki gönderilmiştir." };
+                return new AuthResponse
+                {
+                    Success = true,
+                    Message = "Şifre sıfırlama linki email adresinize gönderildi."
+                };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during forgot password for email {Email}", request.Email);
-                return new AuthResponse { Success = false, Message = "Şifre sıfırlama sırasında bir hata oluştu" };
+                _logger.LogError(ex, "Şifre sıfırlama sırasında hata oluştu");
+                return new AuthResponse { Success = false, Message = "Şifre sıfırlama sırasında bir hata oluştu." };
             }
         }
 
@@ -279,16 +218,6 @@ namespace WebApplication1.Api.Services
         {
             try
             {
-                if (request.NewPassword != request.ConfirmNewPassword)
-                {
-                    return new AuthResponse { Success = false, Message = "Şifreler eşleşmiyor" };
-                }
-
-                if (request.NewPassword.Length < 6)
-                {
-                    return new AuthResponse { Success = false, Message = "Şifre en az 6 karakter olmalıdır" };
-                }
-
                 var user = await _context.Users.FirstOrDefaultAsync(u => 
                     u.Email == request.Email && 
                     u.PasswordResetToken == request.Token &&
@@ -296,21 +225,29 @@ namespace WebApplication1.Api.Services
 
                 if (user == null)
                 {
-                    return new AuthResponse { Success = false, Message = "Geçersiz veya süresi dolmuş token" };
+                    return new AuthResponse { Success = false, Message = "Geçersiz veya süresi dolmuş token." };
+                }
+
+                if (request.NewPassword != request.ConfirmNewPassword)
+                {
+                    return new AuthResponse { Success = false, Message = "Yeni şifreler eşleşmiyor." };
                 }
 
                 user.PasswordHash = HashPassword(request.NewPassword);
                 user.PasswordResetToken = null;
                 user.PasswordResetTokenExpiry = null;
-
                 await _context.SaveChangesAsync();
 
-                return new AuthResponse { Success = true, Message = "Şifre başarıyla sıfırlandı" };
+                return new AuthResponse
+                {
+                    Success = true,
+                    Message = "Şifreniz başarıyla sıfırlandı."
+                };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during password reset");
-                return new AuthResponse { Success = false, Message = "Şifre sıfırlama sırasında bir hata oluştu" };
+                _logger.LogError(ex, "Şifre sıfırlama sırasında hata oluştu");
+                return new AuthResponse { Success = false, Message = "Şifre sıfırlama sırasında bir hata oluştu." };
             }
         }
 
@@ -320,93 +257,124 @@ namespace WebApplication1.Api.Services
             {
                 var user = await _context.Users
                     .Include(u => u.FavoriteTherapists)
-                    .ThenInclude(ft => ft.Therapist)
+                    .ThenInclude(uft => uft.Therapist)
                     .FirstOrDefaultAsync(u => u.Id == userId);
 
                 return user != null ? MapToUserDto(user) : null;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting user profile for {UserId}", userId);
+                _logger.LogError(ex, "Kullanıcı profili alınırken hata oluştu");
                 return null;
             }
         }
 
-        public async Task<bool> AddFavoriteTherapistAsync(int userId, int therapistId)
+        public async Task<AuthResponse> AddFavoriteTherapistAsync(int userId, int therapistId)
         {
             try
             {
-                var exists = await _context.UserFavoriteTherapists
-                    .AnyAsync(uft => uft.UserId == userId && uft.TherapistId == therapistId);
+                var user = await _context.Users.FindAsync(userId);
+                if (user == null)
+                {
+                    return new AuthResponse { Success = false, Message = "Kullanıcı bulunamadı." };
+                }
 
-                if (exists) return true; // Already favorite
+                var therapist = await _context.Therapists.FindAsync(therapistId);
+                if (therapist == null)
+                {
+                    return new AuthResponse { Success = false, Message = "Terapist bulunamadı." };
+                }
+
+                var existingFavorite = await _context.UserFavoriteTherapists
+                    .FirstOrDefaultAsync(uft => uft.UserId == userId && uft.TherapistId == therapistId);
+
+                if (existingFavorite != null)
+                {
+                    return new AuthResponse { Success = false, Message = "Bu terapist zaten favorilerinizde." };
+                }
 
                 var favorite = new UserFavoriteTherapist
                 {
                     UserId = userId,
-                    TherapistId = therapistId,
-                    CreatedAt = DateTime.UtcNow
+                    TherapistId = therapistId
                 };
 
                 _context.UserFavoriteTherapists.Add(favorite);
                 await _context.SaveChangesAsync();
-                return true;
+
+                return new AuthResponse
+                {
+                    Success = true,
+                    Message = "Terapist favorilere eklendi."
+                };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error adding favorite therapist {TherapistId} for user {UserId}", therapistId, userId);
-                return false;
+                _logger.LogError(ex, "Favori terapist ekleme sırasında hata oluştu");
+                return new AuthResponse { Success = false, Message = "Favori terapist ekleme sırasında bir hata oluştu." };
             }
         }
 
-        public async Task<bool> RemoveFavoriteTherapistAsync(int userId, int therapistId)
+        public async Task<AuthResponse> RemoveFavoriteTherapistAsync(int userId, int therapistId)
         {
             try
             {
                 var favorite = await _context.UserFavoriteTherapists
                     .FirstOrDefaultAsync(uft => uft.UserId == userId && uft.TherapistId == therapistId);
 
-                if (favorite == null) return true; // Already removed
+                if (favorite == null)
+                {
+                    return new AuthResponse { Success = false, Message = "Bu terapist favorilerinizde bulunamadı." };
+                }
 
                 _context.UserFavoriteTherapists.Remove(favorite);
                 await _context.SaveChangesAsync();
-                return true;
+
+                return new AuthResponse
+                {
+                    Success = true,
+                    Message = "Terapist favorilerden kaldırıldı."
+                };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error removing favorite therapist {TherapistId} for user {UserId}", therapistId, userId);
-                return false;
+                _logger.LogError(ex, "Favori terapist kaldırma sırasında hata oluştu");
+                return new AuthResponse { Success = false, Message = "Favori terapist kaldırma sırasında bir hata oluştu." };
             }
         }
 
-        public async Task<List<TherapistDto>> GetFavoriteTherapistsAsync(int userId)
+        public async Task<AuthResponse> GetFavoriteTherapistsAsync(int userId)
         {
             try
             {
-                var favorites = await _context.UserFavoriteTherapists
-                    .Include(uft => uft.Therapist)
-                    .Where(uft => uft.UserId == userId)
-                    .Select(uft => new TherapistDto
-                    {
-                        Id = uft.Therapist.Id,
-                        Name = uft.Therapist.Name,
-                        Bio = uft.Therapist.Bio
-                    })
-                    .ToListAsync();
+                var user = await _context.Users
+                    .Include(u => u.FavoriteTherapists)
+                    .ThenInclude(uft => uft.Therapist)
+                    .FirstOrDefaultAsync(u => u.Id == userId);
 
-                return favorites;
+                if (user == null)
+                {
+                    return new AuthResponse { Success = false, Message = "Kullanıcı bulunamadı." };
+                }
+
+                return new AuthResponse
+                {
+                    Success = true,
+                    Message = "Favori terapistler başarıyla alındı.",
+                    User = MapToUserDto(user)
+                };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting favorite therapists for user {UserId}", userId);
-                return new List<TherapistDto>();
+                _logger.LogError(ex, "Favori terapistler alınırken hata oluştu");
+                return new AuthResponse { Success = false, Message = "Favori terapistler alınırken bir hata oluştu." };
             }
         }
 
         private string HashPassword(string password)
         {
             using var sha256 = SHA256.Create();
-            var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password + "LOR_SALT_2024"));
+            var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
             return Convert.ToBase64String(hashedBytes);
         }
 
@@ -417,16 +385,11 @@ namespace WebApplication1.Api.Services
 
         private string GenerateRandomToken()
         {
-            var bytes = new byte[32];
-            using var rng = RandomNumberGenerator.Create();
-            rng.GetBytes(bytes);
-            return Convert.ToBase64String(bytes);
+            return Convert.ToBase64String(Encoding.UTF8.GetBytes($"{Guid.NewGuid()}:{DateTime.UtcNow.Ticks}"));
         }
 
         private string GenerateJwtToken(User user)
         {
-            // In a real application, you would implement JWT token generation here
-            // For now, we'll return a simple token
             return Convert.ToBase64String(Encoding.UTF8.GetBytes($"{user.Id}:{user.Email}:{DateTime.UtcNow.Ticks}"));
         }
 
@@ -442,13 +405,7 @@ namespace WebApplication1.Api.Services
                 CreatedAt = user.CreatedAt,
                 LastLoginAt = user.LastLoginAt,
                 IsEmailVerified = user.IsEmailVerified,
-                Role = user.Role.ToString(),
-                FavoriteTherapists = user.FavoriteTherapists?.Select(ft => new TherapistDto
-                {
-                    Id = ft.Therapist.Id,
-                    Name = ft.Therapist.Name,
-                    Bio = ft.Therapist.Bio
-                }).ToList() ?? new List<TherapistDto>()
+                Role = user.Role.ToString()
             };
         }
 
@@ -532,4 +489,4 @@ namespace WebApplication1.Api.Services
             await _emailService.SendEmailAsync(email, subject, htmlBody);
         }
     }
-}
+} 
