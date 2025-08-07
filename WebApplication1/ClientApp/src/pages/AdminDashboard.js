@@ -6,7 +6,6 @@ import {
   Grid,
   Card,
   CardContent,
-  CardActions,
   Button,
   Tabs,
   Tab,
@@ -31,33 +30,24 @@ import {
   Alert,
   Snackbar,
   CircularProgress,
-  Divider,
   List,
   ListItem,
   ListItemText,
   ListItemAvatar,
-  Avatar,
-  Fab,
-  Tooltip
+  Avatar
 } from '@mui/material';
 import {
-  Dashboard as DashboardIcon,
   CalendarToday as CalendarIcon,
   People as PeopleIcon,
-  Business as ServicesIcon,
   Schedule as ScheduleIcon,
-  Analytics as AnalyticsIcon,
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
   Visibility as ViewIcon,
   Euro as PriceIcon,
   AccessTime as TimeIcon,
-  CheckCircle as CheckIcon,
   Cancel as CancelIcon,
   Person as PersonIcon,
-  Spa as SpaIcon,
-  TrendingUp as TrendingUpIcon,
   AttachMoney as MoneyIcon,
   Today as TodayIcon
 } from '@mui/icons-material';
@@ -129,7 +119,7 @@ function AdminDashboard() {
     loadServices();
     loadTherapists();
     loadAvailability();
-  }, []);
+  }, [loadDashboardData, loadAppointments, loadServices, loadTherapists, loadAvailability]);
 
   const loadDashboardData = async () => {
     try {
@@ -140,7 +130,6 @@ function AdminDashboard() {
       ]);
 
       const appointmentsData = await appointmentsRes.json();
-      const servicesData = await servicesRes.json();
       const therapistsData = await therapistsRes.json();
 
       const today = dayjs().format('YYYY-MM-DD');

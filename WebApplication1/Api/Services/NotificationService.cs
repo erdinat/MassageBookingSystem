@@ -104,11 +104,18 @@ namespace WebApplication1.Api.Services
                 // Gerçek projede Hangfire, Quartz.NET veya Azure Functions kullanılmalı
                 _ = Task.Run(async () =>
                 {
-                    var delay = reminderTime - DateTime.Now;
-                    if (delay > TimeSpan.Zero)
+                    try
                     {
-                        await Task.Delay(delay);
-                        await SendAppointmentReminderAsync(email, phone, customerName, serviceName, appointmentDateTime);
+                        var delay = reminderTime - DateTime.Now;
+                        if (delay > TimeSpan.Zero)
+                        {
+                            await Task.Delay(delay);
+                            await SendAppointmentReminderAsync(email, phone, customerName, serviceName, appointmentDateTime);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, $"Background hatırlatma gönderilirken hata: {appointmentId}");
                     }
                 });
             }

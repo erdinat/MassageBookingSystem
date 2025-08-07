@@ -233,23 +233,23 @@ namespace WebApplication1.Api.Controllers
                         try
                         {
                             await _notificationService.SendAppointmentConfirmationAsync(
-                                fullAppointment.Customer.Email,
-                                fullAppointment.Customer.Phone,
-                                fullAppointment.Customer.Name + " " + fullAppointment.Customer.Surname,
-                                fullAppointment.Service.Name,
-                                fullAppointment.Therapist.Name,
-                                fullAppointment.AvailabilitySlot.StartTime,
-                                fullAppointment.Service.Price
+                                fullAppointment.Customer?.Email ?? "",
+                                fullAppointment.Customer?.Phone ?? "",
+                                (fullAppointment.Customer?.Name ?? "") + " " + (fullAppointment.Customer?.Surname ?? ""),
+                                fullAppointment.Service?.Name ?? "",
+                                fullAppointment.Therapist?.Name ?? "",
+                                fullAppointment.AvailabilitySlot?.StartTime ?? DateTime.Now,
+                                fullAppointment.Service?.Price ?? 0
                             );
 
                             // Hatırlatma zamanla
                             await _notificationService.ScheduleReminderAsync(
                                 fullAppointment.Id,
-                                fullAppointment.AvailabilitySlot.StartTime,
-                                fullAppointment.Customer.Email,
-                                fullAppointment.Customer.Phone,
-                                fullAppointment.Customer.Name + " " + fullAppointment.Customer.Surname,
-                                fullAppointment.Service.Name
+                                fullAppointment.AvailabilitySlot?.StartTime ?? DateTime.Now,
+                                fullAppointment.Customer?.Email ?? "",
+                                fullAppointment.Customer?.Phone ?? "",
+                                (fullAppointment.Customer?.Name ?? "") + " " + (fullAppointment.Customer?.Surname ?? ""),
+                                fullAppointment.Service?.Name ?? ""
                             );
                         }
                         catch (Exception ex)
@@ -326,13 +326,13 @@ namespace WebApplication1.Api.Controllers
                     {
                         // Randevu güncelleme bildirimi (yeniden konfirmasyon olarak)
                         await _notificationService.SendAppointmentConfirmationAsync(
-                            appointment.Customer.Email,
-                            appointment.Customer.Phone,
-                            appointment.Customer.Name + " " + appointment.Customer.Surname,
-                            appointment.Service.Name,
-                            appointment.Therapist.Name,
-                            newSlot.StartTime,
-                            appointment.Service.Price
+                            appointment.Customer?.Email ?? "",
+                            appointment.Customer?.Phone ?? "",
+                            (appointment.Customer?.Name ?? "") + " " + (appointment.Customer?.Surname ?? ""),
+                            appointment.Service?.Name ?? "",
+                            appointment.Therapist?.Name ?? "",
+                            newSlot?.StartTime ?? DateTime.Now,
+                            appointment.Service?.Price ?? 0
                         );
                     }
                     catch (Exception ex)
