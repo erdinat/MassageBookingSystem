@@ -131,7 +131,15 @@ function App() {
   const navigate = useNavigate();
 
   // Dynamic navigation and user state
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user') || 'null'));
+  const [user, setUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('user') || 'null');
+    } catch (error) {
+      console.error('Error parsing user from localStorage:', error);
+      return null;
+    }
+  });
+  
   const isLoggedIn = !!user;
   const isAdmin = user?.role === 'Admin';
   const isTherapist = user?.role === 'Therapist';
@@ -148,13 +156,38 @@ function App() {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
-  // Update user state on storage change (e.g., login/logout from another tab)
+  // Update user state on storage change and page load
   useEffect(() => {
-    const handleStorageChange = () => {
-      setUser(JSON.parse(localStorage.getItem('user') || 'null'));
+    const updateUserState = () => {
+      try {
+        const userData = JSON.parse(localStorage.getItem('user') || 'null');
+        setUser(userData);
+      } catch (error) {
+        console.error('Error parsing user from localStorage:', error);
+        setUser(null);
+      }
     };
+
+    // Update on page load
+    updateUserState();
+
+    // Update on storage change (e.g., login/logout from another tab)
+    const handleStorageChange = () => {
+      updateUserState();
+    };
+
+    // Update on custom user state change event
+    const handleUserStateChanged = (event) => {
+      setUser(event.detail.user);
+    };
+    
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    window.addEventListener('userStateChanged', handleUserStateChanged);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('userStateChanged', handleUserStateChanged);
+    };
   }, []);
 
   // Dynamic navigation based on user status
@@ -226,6 +259,11 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    
+    // Dispatch custom event to notify about logout
+    window.dispatchEvent(new CustomEvent('userStateChanged', { 
+      detail: { user: null } 
+    }));
     setUser(null); // Update state
     handleClose();
     navigate('/');

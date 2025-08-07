@@ -83,6 +83,11 @@ function LoginRegisterPage() {
         localStorage.setItem('user', JSON.stringify(result.user));
         localStorage.setItem('token', result.token);
         
+        // Dispatch custom event to notify App.js about user state change
+        window.dispatchEvent(new CustomEvent('userStateChanged', { 
+          detail: { user: result.user } 
+        }));
+        
         showAlert('Giriş başarılı! Yönlendiriliyorsunuz...', 'success');
         
         // Redirect to intended page or home
@@ -131,6 +136,11 @@ function LoginRegisterPage() {
         // Store user data in localStorage
         localStorage.setItem('user', JSON.stringify(result.user));
         localStorage.setItem('token', result.token);
+        
+        // Dispatch custom event to notify App.js about user state change
+        window.dispatchEvent(new CustomEvent('userStateChanged', { 
+          detail: { user: result.user } 
+        }));
         
         showAlert(result.message, 'success');
         
