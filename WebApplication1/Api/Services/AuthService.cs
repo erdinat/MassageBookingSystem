@@ -17,9 +17,6 @@ namespace WebApplication1.Api.Services
         Task<AuthResponse> ForgotPasswordAsync(ForgotPasswordRequest request);
         Task<AuthResponse> ResetPasswordAsync(ResetPasswordRequest request);
         Task<UserDto?> GetUserProfileAsync(int userId);
-        Task<AuthResponse> AddFavoriteTherapistAsync(int userId, int therapistId);
-        Task<AuthResponse> RemoveFavoriteTherapistAsync(int userId, int therapistId);
-        Task<AuthResponse> GetFavoriteTherapistsAsync(int userId);
     }
 
     public class AuthService : IAuthService
@@ -90,8 +87,6 @@ namespace WebApplication1.Api.Services
             try
             {
                 var user = await _context.Users
-                    .Include(u => u.FavoriteTherapists)
-                    .ThenInclude(uft => uft.Therapist)
                     .FirstOrDefaultAsync(u => u.Email == request.Email);
 
                 if (user == null || !VerifyPassword(request.Password, user.PasswordHash))
@@ -256,8 +251,6 @@ namespace WebApplication1.Api.Services
             try
             {
                 var user = await _context.Users
-                    .Include(u => u.FavoriteTherapists)
-                    .ThenInclude(uft => uft.Therapist)
                     .FirstOrDefaultAsync(u => u.Id == userId);
 
                 return user != null ? MapToUserDto(user) : null;
@@ -269,107 +262,7 @@ namespace WebApplication1.Api.Services
             }
         }
 
-        public async Task<AuthResponse> AddFavoriteTherapistAsync(int userId, int therapistId)
-        {
-            try
-            {
-                var user = await _context.Users.FindAsync(userId);
-                if (user == null)
-                {
-                    return new AuthResponse { Success = false, Message = "Kullanıcı bulunamadı." };
-                }
 
-                var therapist = await _context.Therapists.FindAsync(therapistId);
-                if (therapist == null)
-                {
-                    return new AuthResponse { Success = false, Message = "Terapist bulunamadı." };
-                }
-
-                var existingFavorite = await _context.UserFavoriteTherapists
-                    .FirstOrDefaultAsync(uft => uft.UserId == userId && uft.TherapistId == therapistId);
-
-                if (existingFavorite != null)
-                {
-                    return new AuthResponse { Success = false, Message = "Bu terapist zaten favorilerinizde." };
-                }
-
-                var favorite = new UserFavoriteTherapist
-                {
-                    UserId = userId,
-                    TherapistId = therapistId
-                };
-
-                _context.UserFavoriteTherapists.Add(favorite);
-                await _context.SaveChangesAsync();
-
-                return new AuthResponse
-                {
-                    Success = true,
-                    Message = "Terapist favorilere eklendi."
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Favori terapist ekleme sırasında hata oluştu");
-                return new AuthResponse { Success = false, Message = "Favori terapist ekleme sırasında bir hata oluştu." };
-            }
-        }
-
-        public async Task<AuthResponse> RemoveFavoriteTherapistAsync(int userId, int therapistId)
-        {
-            try
-            {
-                var favorite = await _context.UserFavoriteTherapists
-                    .FirstOrDefaultAsync(uft => uft.UserId == userId && uft.TherapistId == therapistId);
-
-                if (favorite == null)
-                {
-                    return new AuthResponse { Success = false, Message = "Bu terapist favorilerinizde bulunamadı." };
-                }
-
-                _context.UserFavoriteTherapists.Remove(favorite);
-                await _context.SaveChangesAsync();
-
-                return new AuthResponse
-                {
-                    Success = true,
-                    Message = "Terapist favorilerden kaldırıldı."
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Favori terapist kaldırma sırasında hata oluştu");
-                return new AuthResponse { Success = false, Message = "Favori terapist kaldırma sırasında bir hata oluştu." };
-            }
-        }
-
-        public async Task<AuthResponse> GetFavoriteTherapistsAsync(int userId)
-        {
-            try
-            {
-                var user = await _context.Users
-                    .Include(u => u.FavoriteTherapists)
-                    .ThenInclude(uft => uft.Therapist)
-                    .FirstOrDefaultAsync(u => u.Id == userId);
-
-                if (user == null)
-                {
-                    return new AuthResponse { Success = false, Message = "Kullanıcı bulunamadı." };
-                }
-
-                return new AuthResponse
-                {
-                    Success = true,
-                    Message = "Favori terapistler başarıyla alındı.",
-                    User = MapToUserDto(user)
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Favori terapistler alınırken hata oluştu");
-                return new AuthResponse { Success = false, Message = "Favori terapistler alınırken bir hata oluştu." };
-            }
-        }
 
         private string HashPassword(string password)
         {

@@ -24,7 +24,6 @@ namespace WebApplication1.Api.Models
         public UserRole Role { get; set; } = UserRole.Customer;
         
         // Navigation properties
-        public ICollection<UserFavoriteTherapist> FavoriteTherapists { get; set; } = new List<UserFavoriteTherapist>();
         public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
         public Therapist? TherapistProfile { get; set; }
     }

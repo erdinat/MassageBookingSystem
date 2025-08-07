@@ -13,7 +13,6 @@ namespace WebApplication1.Api.Data
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<User> Users { get; set; }
-        public DbSet<UserFavoriteTherapist> UserFavoriteTherapists { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -24,18 +23,7 @@ namespace WebApplication1.Api.Data
                 .Property(s => s.Price)
                 .HasPrecision(10, 2);
 
-            // User relationships
-            modelBuilder.Entity<UserFavoriteTherapist>()
-                .HasOne(uft => uft.User)
-                .WithMany(u => u.FavoriteTherapists)
-                .HasForeignKey(uft => uft.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<UserFavoriteTherapist>()
-                .HasOne(uft => uft.Therapist)
-                .WithMany()
-                .HasForeignKey(uft => uft.TherapistId)
-                .OnDelete(DeleteBehavior.Restrict);
 
             // User-Therapist relationship
             modelBuilder.Entity<Therapist>()

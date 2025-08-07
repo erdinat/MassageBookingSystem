@@ -236,61 +236,6 @@ namespace WebApplication1.Api.Controllers
             }
         }
 
-        [HttpPost("favorites/{userId}/add/{therapistId}")]
-        public async Task<ActionResult> AddFavoriteTherapist(int userId, int therapistId)
-        {
-            try
-            {
-                var result = await _authService.AddFavoriteTherapistAsync(userId, therapistId);
-                
-                if (result.Success)
-                {
-                    return Ok(new { message = result.Message });
-                }
-                
-                return BadRequest(new { message = result.Message });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error adding favorite therapist");
-                return StatusCode(500, new { message = "Sunucu hatası" });
-            }
-        }
 
-        [HttpDelete("favorites/{userId}/remove/{therapistId}")]
-        public async Task<ActionResult> RemoveFavoriteTherapist(int userId, int therapistId)
-        {
-            try
-            {
-                var result = await _authService.RemoveFavoriteTherapistAsync(userId, therapistId);
-                
-                if (result.Success)
-                {
-                    return Ok(new { message = result.Message });
-                }
-                
-                return BadRequest(new { message = result.Message });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error removing favorite therapist");
-                return StatusCode(500, new { message = "Sunucu hatası" });
-            }
-        }
-
-        [HttpGet("favorites/{userId}")]
-        public async Task<ActionResult<AuthResponse>> GetFavoriteTherapists(int userId)
-        {
-            try
-            {
-                var result = await _authService.GetFavoriteTherapistsAsync(userId);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error getting favorite therapists");
-                return StatusCode(500, new AuthResponse { Success = false, Message = "Sunucu hatası" });
-            }
-        }
     }
 }
