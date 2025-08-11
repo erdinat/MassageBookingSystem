@@ -24,8 +24,9 @@ namespace WebApplication1.Api.Controllers
                 {
                     a.Id,
                     a.TherapistId,
-                    StartTime = a.StartTime.ToLocalTime(), // Türkiye saatine çevir
-                    EndTime = a.EndTime.ToLocalTime(), // Türkiye saatine çevir
+                    // Veritabanında UTC saklıyoruz; JSON'da da UTC olarak işaretleyelim
+                    StartTime = DateTime.SpecifyKind(a.StartTime, DateTimeKind.Utc),
+                    EndTime = DateTime.SpecifyKind(a.EndTime, DateTimeKind.Utc),
                     a.IsBooked,
                     Therapist = new
                     {
@@ -50,8 +51,8 @@ namespace WebApplication1.Api.Controllers
                 {
                     a.Id,
                     a.TherapistId,
-                    StartTime = a.StartTime.ToLocalTime(), // Türkiye saatine çevir
-                    EndTime = a.EndTime.ToLocalTime(), // Türkiye saatine çevir
+                    StartTime = DateTime.SpecifyKind(a.StartTime, DateTimeKind.Utc),
+                    EndTime = DateTime.SpecifyKind(a.EndTime, DateTimeKind.Utc),
                     a.IsBooked,
                     Therapist = new
                     {
@@ -69,10 +70,17 @@ namespace WebApplication1.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<AvailabilitySlot>> CreateSlot(AvailabilitySlot slot)
         {
-            // Türkiye saatini UTC'ye çevir
-            var turkeyTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Turkey Standard Time");
-            slot.StartTime = TimeZoneInfo.ConvertTimeToUtc(slot.StartTime, turkeyTimeZone);
-            slot.EndTime = TimeZoneInfo.ConvertTimeToUtc(slot.EndTime, turkeyTimeZone);
+            // Eğer UTC geldiyse dokunma; değilse Türkiye saatinden UTC'ye çevir
+            static DateTime NormalizeToUtc(DateTime dt)
+            {
+                if (dt.Kind == DateTimeKind.Utc) return dt;
+                var unspecified = DateTime.SpecifyKind(dt, DateTimeKind.Unspecified);
+                var turkeyTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Turkey Standard Time");
+                return TimeZoneInfo.ConvertTimeToUtc(unspecified, turkeyTimeZone);
+            }
+
+            slot.StartTime = NormalizeToUtc(slot.StartTime);
+            slot.EndTime = NormalizeToUtc(slot.EndTime);
             
             _context.AvailabilitySlots.Add(slot);
             await _context.SaveChangesAsync();
@@ -84,10 +92,17 @@ namespace WebApplication1.Api.Controllers
         {
             if (id != slot.Id) return BadRequest();
             
-            // Türkiye saatini UTC'ye çevir
-            var turkeyTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Turkey Standard Time");
-            slot.StartTime = TimeZoneInfo.ConvertTimeToUtc(slot.StartTime, turkeyTimeZone);
-            slot.EndTime = TimeZoneInfo.ConvertTimeToUtc(slot.EndTime, turkeyTimeZone);
+            // UTC ise aynen bırak; değilse TR'den UTC'ye çevir
+            static DateTime NormalizeToUtc(DateTime dt)
+            {
+                if (dt.Kind == DateTimeKind.Utc) return dt;
+                var unspecified = DateTime.SpecifyKind(dt, DateTimeKind.Unspecified);
+                var turkeyTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Turkey Standard Time");
+                return TimeZoneInfo.ConvertTimeToUtc(unspecified, turkeyTimeZone);
+            }
+
+            slot.StartTime = NormalizeToUtc(slot.StartTime);
+            slot.EndTime = NormalizeToUtc(slot.EndTime);
             
             _context.Entry(slot).State = EntityState.Modified;
             await _context.SaveChangesAsync();

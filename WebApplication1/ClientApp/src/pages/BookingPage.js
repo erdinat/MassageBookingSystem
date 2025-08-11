@@ -23,7 +23,12 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
-  Divider
+  Divider,
+  Stack,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  FormLabel
 } from '@mui/material';
 import { 
   Person as PersonIcon,
@@ -52,7 +57,7 @@ dayjs.locale('tr');
 // Türkiye saati için timezone ayarı
 const TIMEZONE = 'Europe/Istanbul';
 
-const steps = ['Hizmet Onayı', 'Terapist Seçimi', 'Tarih Seçimi', 'Saat Seçimi', 'Bilgileriniz'];
+const steps = ['Hizmet Onayı', 'Terapist Seçimi', 'Tarih Seçimi', 'Saat Seçimi', 'Bilgileriniz', 'Ödeme'];
 
 const stepVariants = {
   hidden: { opacity: 0, x: 50 },
@@ -79,6 +84,16 @@ function BookingPage() {
     phone: '',
     email: ''
   });
+
+  // Payment states
+  const [paymentMethod, setPaymentMethod] = useState('card'); // 'card' | 'cash'
+  const [cardInfo, setCardInfo] = useState({
+    cardNumber: '',
+    cardHolder: '',
+    expiry: '', // MM/YY
+    cvv: ''
+  });
+  const [paymentError, setPaymentError] = useState('');
 
   // Load service details
   useEffect(() => {
@@ -174,8 +189,14 @@ function BookingPage() {
     try {
       setLoading(true);
       
-      // Get current user from localStorage  
-      const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+      // Get current user from localStorage (support both keys)
+      let currentUser = null;
+      try {
+        currentUser = JSON.parse(localStorage.getItem('user') || 'null');
+      } catch {}
+      if (!currentUser) {
+        try { currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null'); } catch {}
+      }
       
       // Create customer
       const customerResponse = await fetch('/api/customers', {
@@ -191,7 +212,7 @@ function BookingPage() {
         therapistId: selectedTherapist.id,
         availabilitySlotId: selectedSlot.id,
         customerId: customer.id,
-        userId: currentUser.id ? parseInt(currentUser.id) : null, // UserId ekle
+        userId: currentUser?.id ? parseInt(currentUser.id) : null,
       };
 
       console.log('Creating appointment with data:', appointmentData);
@@ -228,6 +249,61 @@ function BookingPage() {
     }
   };
 
+  const handlePayAndBook = async () => {
+    try {
+      setPaymentError('');
+      setLoading(true);
+
+      // Basic validations for card
+      if (paymentMethod === 'card') {
+        const compact = cardInfo.cardNumber.replace(/\s+/g, '');
+        if (compact.length < 12) {
+          setPaymentError('Kart numarası geçersiz.');
+          setLoading(false);
+          return;
+        }
+        if (!cardInfo.cardHolder || !cardInfo.expiry || cardInfo.cvv.length < 3) {
+          setPaymentError('Kart bilgilerini eksiksiz doldurun.');
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Simulate payment
+      const res = await fetch('/api/payments/simulate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          paymentMethod,
+          amount: service?.price || 0,
+          cardNumber: paymentMethod === 'card' ? cardInfo.cardNumber : undefined,
+          cardHolder: paymentMethod === 'card' ? cardInfo.cardHolder : undefined,
+          expiry: paymentMethod === 'card' ? cardInfo.expiry : undefined,
+          cvv: paymentMethod === 'card' ? cardInfo.cvv : undefined,
+        })
+      });
+      if (!res.ok) {
+        const msg = await res.text();
+        setPaymentError(msg || 'Ödeme başarısız.');
+        setLoading(false);
+        return;
+      }
+      const payment = await res.json();
+      if (!payment.success) {
+        setPaymentError(payment.message || 'Ödeme reddedildi.');
+        setLoading(false);
+        return;
+      }
+
+      // Payment ok → proceed to booking
+      await handleBooking();
+    } catch (e) {
+      setPaymentError('Ödeme sırasında beklenmeyen bir hata oluştu.');
+    } finally {
+      // handleBooking already toggles loading off at the end, so avoid double-off here
+    }
+  };
+
   const canProceed = () => {
     switch (activeStep) {
       case 0: return service !== null;
@@ -235,6 +311,15 @@ function BookingPage() {
       case 2: return selectedDate !== null;
       case 3: return selectedSlot !== null;
       case 4: return customerInfo.name && customerInfo.surname && customerInfo.phone && customerInfo.email;
+      case 5:
+        if (paymentMethod === 'cash') return true;
+        // basic presence checks for card
+        return (
+          cardInfo.cardNumber.trim().length >= 12 &&
+          cardInfo.cardHolder.trim().length > 0 &&
+          cardInfo.expiry.trim().length >= 4 &&
+          cardInfo.cvv.trim().length >= 3
+        );
       default: return false;
     }
   };
@@ -636,6 +721,87 @@ function BookingPage() {
           </motion.div>
         );
 
+      case 5:
+        return (
+          <motion.div
+            variants={stepVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            transition={{ duration: 0.5 }}
+          >
+            <Typography variant="h5" sx={{ color: '#8B6F47', mb: 3, fontWeight: 'bold', textAlign: 'center' }}>
+              Ödeme Yöntemi
+            </Typography>
+
+            <Card sx={{ backgroundColor: '#F5F1E8', border: '2px solid #D4B896', mb: 3 }}>
+              <CardContent>
+                <FormLabel component="legend" sx={{ color: '#8B6F47', mb: 1 }}>Ödeme Tipi</FormLabel>
+                <RadioGroup
+                  row
+                  value={paymentMethod}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                >
+                  <FormControlLabel value="card" control={<Radio />} label="Kart" />
+                  <FormControlLabel value="cash" control={<Radio />} label="Nakit" />
+                </RadioGroup>
+              </CardContent>
+            </Card>
+
+            {paymentMethod === 'card' && (
+              <Stack spacing={3}>
+                <TextField
+                  label="Kart Sahibi"
+                  value={cardInfo.cardHolder}
+                  onChange={(e) => setCardInfo({ ...cardInfo, cardHolder: e.target.value })}
+                  fullWidth
+                  sx={{
+                    '& .MuiInputBase-root': { backgroundColor: '#F5F1E8' },
+                    '& .MuiOutlinedInput-root fieldset': { borderColor: '#D4B896' }
+                  }}
+                />
+                <TextField
+                  label="Kart Numarası"
+                  value={cardInfo.cardNumber}
+                  onChange={(e) => setCardInfo({ ...cardInfo, cardNumber: e.target.value })}
+                  fullWidth
+                  placeholder="4242 4242 4242 4242"
+                  sx={{
+                    '& .MuiInputBase-root': { backgroundColor: '#F5F1E8' },
+                    '& .MuiOutlinedInput-root fieldset': { borderColor: '#D4B896' }
+                  }}
+                />
+                <TextField
+                  label="SKT (AA/YY)"
+                  value={cardInfo.expiry}
+                  onChange={(e) => setCardInfo({ ...cardInfo, expiry: e.target.value })}
+                  placeholder="12/27"
+                  fullWidth
+                  sx={{
+                    '& .MuiInputBase-root': { backgroundColor: '#F5F1E8' },
+                    '& .MuiOutlinedInput-root fieldset': { borderColor: '#D4B896' }
+                  }}
+                />
+                <TextField
+                  label="CVV"
+                  value={cardInfo.cvv}
+                  onChange={(e) => setCardInfo({ ...cardInfo, cvv: e.target.value })}
+                  fullWidth
+                  type="password"
+                  sx={{
+                    '& .MuiInputBase-root': { backgroundColor: '#F5F1E8' },
+                    '& .MuiOutlinedInput-root fieldset': { borderColor: '#D4B896' }
+                  }}
+                />
+              </Stack>
+            )}
+
+            {paymentError && (
+              <Alert severity="error" sx={{ mt: 3 }}>{paymentError}</Alert>
+            )}
+          </motion.div>
+        );
+
       default:
         return null;
     }
@@ -704,7 +870,7 @@ function BookingPage() {
 
         {activeStep === steps.length - 1 ? (
                   <Button
-                    onClick={handleBooking}
+                    onClick={handlePayAndBook}
                     disabled={!canProceed() || loading}
                     variant="contained"
                     size="large"
@@ -717,7 +883,7 @@ function BookingPage() {
                       },
                     }}
                   >
-                    {loading ? <CircularProgress size={24} color="inherit" /> : 'Randevuyu Tamamla'}
+                    {loading ? <CircularProgress size={24} color="inherit" /> : 'Ödemeyi Yap ve Randevuyu Tamamla'}
                   </Button>
                 ) : (
                   <Button

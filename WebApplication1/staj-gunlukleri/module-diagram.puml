@@ -1,0 +1,147 @@
+@startuml LOR_Masaj_Merkezi_ModuleDiagram
+
+!theme plain
+skinparam component {
+    BackgroundColor LightBlue
+    BorderColor DarkBlue
+    ArrowColor DarkBlue
+    FontSize 12
+}
+
+title L'OR Masaj Merkezi Randevu Sistemi - Modül Diyagramı
+
+package "Frontend (React.js)" {
+    [Ana Sayfa] as HomePage
+    [Hizmetler Sayfası] as ServicesPage
+    [Terapistler Sayfası] as TherapistsPage
+    [Randevu Alma Sayfası] as BookingPage
+    [Profil Sayfası] as ProfilePage
+    [Admin Paneli] as AdminDashboard
+    [Giriş/Kayıt Sayfası] as LoginRegisterPage
+    [Randevu Yönetimi] as AppointmentManagementPage
+    
+    package "Bileşenler" {
+        [Hizmet Kartı] as ServiceCard
+        [Terapist Kartı] as TherapistCard
+        [Randevu Kartı] as AppointmentCard
+        [Takvim Bileşeni] as CalendarComponent
+        [Form Bileşenleri] as FormComponents
+    }
+    
+    package "Servisler" {
+        [API Servisi] as ApiService
+        [Auth Servisi] as AuthService
+        [LocalStorage Servisi] as StorageService
+    }
+}
+
+package "Backend (ASP.NET Core)" {
+    package "Controllers" {
+        [AuthController] as AuthController
+        [AppointmentsController] as AppointmentsController
+        [ServicesController] as ServicesController
+        [TherapistsController] as TherapistsController
+        [AvailabilityController] as AvailabilityController
+        [CustomersController] as CustomersController
+        [DebugController] as DebugController
+    }
+    
+    package "Services" {
+        [AuthService] as BackendAuthService
+        [AppointmentService] as AppointmentService
+        [NotificationService] as NotificationService
+        [EmailService] as EmailService
+        [SmsService] as SmsService
+    }
+    
+    package "Models" {
+        [User Model] as UserModel
+        [Service Model] as ServiceModel
+        [Therapist Model] as TherapistModel
+        [Appointment Model] as AppointmentModel
+        [AvailabilitySlot Model] as AvailabilityModel
+        [Customer Model] as CustomerModel
+    }
+    
+    package "Data" {
+        [ApplicationDbContext] as DbContext
+        [Migrations] as Migrations
+    }
+    
+    package "DTOs" {
+        [AuthDTOs] as AuthDTOs
+        [AppointmentDTOs] as AppointmentDTOs
+        [ServiceDTOs] as ServiceDTOs
+        [TherapistDTOs] as TherapistDTOs
+    }
+}
+
+package "Database (SQL Server)" {
+    database "Users" as UsersDB
+    database "Services" as ServicesDB
+    database "Therapists" as TherapistsDB
+    database "Appointments" as AppointmentsDB
+    database "AvailabilitySlots" as AvailabilityDB
+    database "Customers" as CustomersDB
+    database "UserFavoriteTherapists" as FavoritesDB
+}
+
+' Frontend İlişkileri
+HomePage --> ServicesPage
+HomePage --> TherapistsPage
+HomePage --> BookingPage
+ServicesPage --> ServiceCard
+TherapistsPage --> TherapistCard
+BookingPage --> CalendarComponent
+BookingPage --> FormComponents
+ProfilePage --> AppointmentCard
+AdminDashboard --> AppointmentManagementPage
+LoginRegisterPage --> AuthService
+
+' Backend İlişkileri
+AuthController --> BackendAuthService
+AppointmentsController --> AppointmentService
+AppointmentsController --> NotificationService
+ServicesController --> ServiceModel
+TherapistsController --> TherapistModel
+AvailabilityController --> AvailabilityModel
+CustomersController --> CustomerModel
+
+' Service İlişkileri
+BackendAuthService --> UserModel
+AppointmentService --> AppointmentModel
+NotificationService --> EmailService
+NotificationService --> SmsService
+
+' Model İlişkileri
+UserModel --> DbContext
+ServiceModel --> DbContext
+TherapistModel --> DbContext
+AppointmentModel --> DbContext
+AvailabilityModel --> DbContext
+CustomerModel --> DbContext
+
+' Database İlişkileri
+DbContext --> UsersDB
+DbContext --> ServicesDB
+DbContext --> TherapistsDB
+DbContext --> AppointmentsDB
+DbContext --> AvailabilityDB
+DbContext --> CustomersDB
+DbContext --> FavoritesDB
+
+' Frontend-Backend İlişkileri
+ApiService --> AuthController
+ApiService --> AppointmentsController
+ApiService --> ServicesController
+ApiService --> TherapistsController
+ApiService --> AvailabilityController
+ApiService --> CustomersController
+
+' DTO İlişkileri
+AuthController --> AuthDTOs
+AppointmentsController --> AppointmentDTOs
+ServicesController --> ServiceDTOs
+TherapistsController --> TherapistDTOs
+
+@enduml

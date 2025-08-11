@@ -1,0 +1,180 @@
+@startuml LOR_Masaj_Merkezi_DomainDiagram
+
+!theme plain
+skinparam class {
+    BackgroundColor LightGreen
+    BorderColor DarkGreen
+    ArrowColor DarkGreen
+    FontSize 11
+}
+
+title L'OR Masaj Merkezi Randevu Sistemi - Domain Diyagramı
+
+' Ana Domain Entity'ler
+class User {
+    +Id: int
+    +Name: string
+    +Email: string
+    +PasswordHash: string
+    +Role: UserRole
+    +CreatedAt: DateTime
+    +UpdatedAt: DateTime
+    --
+    +Authenticate(password: string): bool
+    +UpdateProfile(profile: UserProfile): void
+    +ChangePassword(oldPassword: string, newPassword: string): bool
+}
+
+class Customer {
+    +Id: int
+    +Name: string
+    +Surname: string
+    +Phone: string
+    +Email: string
+    +CreatedAt: DateTime
+    +UpdatedAt: DateTime
+    --
+    +BookAppointment(appointment: Appointment): bool
+    +CancelAppointment(appointmentId: int): bool
+    +RescheduleAppointment(appointmentId: int, newSlot: AvailabilitySlot): bool
+    +ViewAppointmentHistory(): List<Appointment>
+}
+
+class Therapist {
+    +Id: int
+    +Name: string
+    +Bio: string
+    +ProfilePictureUrl: string
+    +UserId: int
+    +CreatedAt: DateTime
+    +UpdatedAt: DateTime
+    --
+    +AddAvailabilitySlot(slot: AvailabilitySlot): bool
+    +UpdateAvailabilitySlot(slotId: int, slot: AvailabilitySlot): bool
+    +RemoveAvailabilitySlot(slotId: int): bool
+    +ViewAppointments(): List<Appointment>
+    +UpdateProfile(profile: TherapistProfile): void
+}
+
+class Service {
+    +Id: int
+    +Name: string
+    +Description: string
+    +Price: decimal
+    +DurationMinutes: int
+    +CreatedAt: DateTime
+    +UpdatedAt: DateTime
+    --
+    +CalculatePrice(): decimal
+    +GetDuration(): TimeSpan
+    +IsAvailable(): bool
+}
+
+class AvailabilitySlot {
+    +Id: int
+    +TherapistId: int
+    +StartTime: DateTime
+    +EndTime: DateTime
+    +IsBooked: bool
+    +CreatedAt: DateTime
+    +UpdatedAt: DateTime
+    --
+    +IsAvailable(): bool
+    +Book(): bool
+    +Cancel(): bool
+    +GetDuration(): TimeSpan
+    +OverlapsWith(other: AvailabilitySlot): bool
+}
+
+class Appointment {
+    +Id: int
+    +UserId: int
+    +CustomerId: int
+    +TherapistId: int
+    +ServiceId: int
+    +AvailabilitySlotId: int
+    +CreatedAt: DateTime
+    +UpdatedAt: DateTime
+    --
+    +Create(): bool
+    +Cancel(): bool
+    +Reschedule(newSlot: AvailabilitySlot): bool
+    +Confirm(): bool
+    +GetTotalPrice(): decimal
+    +GetDuration(): TimeSpan
+    +IsUpcoming(): bool
+    +IsPast(): bool
+}
+
+class UserFavoriteTherapist {
+    +Id: int
+    +UserId: int
+    +TherapistId: int
+    +CreatedAt: DateTime
+    --
+    +AddToFavorites(): bool
+    +RemoveFromFavorites(): bool
+    +IsFavorite(): bool
+}
+
+' Value Objects
+class UserProfile {
+    +Name: string
+    +Email: string
+    +Phone: string
+}
+
+class TherapistProfile {
+    +Name: string
+    +Bio: string
+    +ProfilePictureUrl: string
+}
+
+class AppointmentDetails {
+    +CustomerName: string
+    +TherapistName: string
+    +ServiceName: string
+    +StartTime: DateTime
+    +EndTime: DateTime
+    +TotalPrice: decimal
+}
+
+' Enum'lar
+enum UserRole {
+    Admin
+    Therapist
+    Customer
+}
+
+enum AppointmentStatus {
+    Pending
+    Confirmed
+    Cancelled
+    Completed
+}
+
+' İlişkiler
+User ||--o{ Appointment : "creates"
+User ||--o{ UserFavoriteTherapist : "favorites"
+User ||--|| Therapist : "has"
+
+Customer ||--o{ Appointment : "books"
+
+Therapist ||--o{ AvailabilitySlot : "provides"
+Therapist ||--o{ Appointment : "performs"
+Therapist ||--o{ UserFavoriteTherapist : "favorited_by"
+
+Service ||--o{ Appointment : "included_in"
+
+AvailabilitySlot ||--|| Appointment : "booked_for"
+
+' Value Object İlişkileri
+User --> UserProfile : "has"
+Therapist --> TherapistProfile : "has"
+Appointment --> AppointmentDetails : "contains"
+
+' Enum İlişkileri
+User --> UserRole : "has"
+Appointment --> AppointmentStatus : "has"
+
+@enduml

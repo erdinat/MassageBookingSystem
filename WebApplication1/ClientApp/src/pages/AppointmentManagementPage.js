@@ -134,7 +134,7 @@ function AppointmentManagementPage() {
         const data = await response.json();
         const filteredSlots = data.filter(slot => 
           !slot.isBooked &&
-          dayjs(slot.startTime).format('YYYY-MM-DD') === selectedDate.format('YYYY-MM-DD') &&
+          dayjs.utc(slot.startTime).tz('Europe/Istanbul').format('YYYY-MM-DD') === selectedDate.format('YYYY-MM-DD') &&
           (selectedTherapist ? slot.therapistId === parseInt(selectedTherapist) : true)
         );
         setAvailableSlots(filteredSlots);
@@ -257,7 +257,7 @@ function AppointmentManagementPage() {
   };
 
   const AppointmentCard = ({ appointment, showActions = true }) => {
-    const appointmentDate = appointment.availabilitySlot?.startTime ? dayjs(appointment.availabilitySlot.startTime) : null;
+    const appointmentDate = appointment.availabilitySlot?.startTime ? dayjs.utc(appointment.availabilitySlot.startTime).tz('Europe/Istanbul') : null;
     const isUpcoming = appointmentDate ? appointmentDate.isAfter(dayjs()) : false;
     
     return (

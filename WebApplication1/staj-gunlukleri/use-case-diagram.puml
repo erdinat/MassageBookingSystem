@@ -1,0 +1,103 @@
+@startuml LOR_Masaj_Merkezi_UseCase
+
+!theme plain
+left to right direction
+skinparam actorStyle awesome
+skinparam usecase {
+    BackgroundColor LightBlue
+    BorderColor DarkBlue
+    ArrowColor DarkBlue
+    FontSize 10
+}
+
+title L'OR Masaj Merkezi Randevu Sistemi - Use Case Diyagramı
+
+' Aktörler (Sol taraf)
+actor "Müşteri" as Customer
+actor "Terapist" as Therapist
+actor "Admin" as Admin
+
+' Use Case'ler (Sağ taraf - daha kompakt)
+rectangle "L'OR Masaj Merkezi Randevu Sistemi" {
+    usecase "Kayıt Ol" as UC1
+    usecase "Giriş Yap" as UC2
+    usecase "Profil Güncelle" as UC3
+    usecase "Şifre Sıfırla" as UC4
+    
+    usecase "Hizmetleri Görüntüle" as UC5
+    usecase "Hizmet Arama" as UC6
+    usecase "Terapistleri Görüntüle" as UC7
+    usecase "Terapist Arama" as UC8
+    
+    usecase "Randevu Al" as UC9
+    usecase "Randevu İptal Et" as UC10
+    usecase "Randevu Güncelle" as UC11
+    usecase "Randevu Geçmişi" as UC12
+    
+    usecase "Müsaitlik Ekle" as UC13
+    usecase "Müsaitlik Düzenle" as UC14
+    usecase "Müsaitlik Sil" as UC15
+    usecase "Takvim Görüntüle" as UC16
+    
+    usecase "Randevu Onayla" as UC17
+    usecase "Fotoğraf Yükle" as UC18
+    usecase "Biyografi Düzenle" as UC19
+    
+    usecase "Dashboard" as UC20
+    usecase "Kullanıcı Yönetimi" as UC21
+    usecase "Hizmet Ekle" as UC22
+    usecase "Hizmet Düzenle" as UC23
+    usecase "Hizmet Sil" as UC24
+    usecase "İstatistikler" as UC25
+    usecase "Rapor Oluştur" as UC26
+    usecase "Veri Yedekle" as UC27
+}
+
+' Müşteri İlişkileri (Sol taraftan)
+Customer --> UC1
+Customer --> UC2
+Customer --> UC3
+Customer --> UC4
+Customer --> UC5
+Customer --> UC6
+Customer --> UC7
+Customer --> UC8
+Customer --> UC9
+Customer --> UC10
+Customer --> UC11
+Customer --> UC12
+
+' Terapist İlişkileri (Sol taraftan)
+Therapist --> UC2
+Therapist --> UC3
+Therapist --> UC13
+Therapist --> UC14
+Therapist --> UC15
+Therapist --> UC16
+Therapist --> UC17
+Therapist --> UC18
+Therapist --> UC19
+Therapist --> UC12
+
+' Admin İlişkileri (Sol taraftan)
+Admin --> UC2
+Admin --> UC20
+Admin --> UC21
+Admin --> UC22
+Admin --> UC23
+Admin --> UC24
+Admin --> UC25
+Admin --> UC26
+Admin --> UC27
+
+' Include İlişkileri
+UC9 ..> UC5 : <<include>>
+UC9 ..> UC7 : <<include>>
+UC9 ..> UC16 : <<include>>
+UC11 ..> UC16 : <<include>>
+
+' Extend İlişkileri
+UC6 ..> UC5 : <<extend>>
+UC8 ..> UC7 : <<extend>>
+
+@enduml

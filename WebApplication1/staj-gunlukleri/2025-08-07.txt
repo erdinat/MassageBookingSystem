@@ -1,0 +1,550 @@
+STAJ DEFTERİ - 7 AĞUSTOS 2025
+
+==========================================
+PROJE RAPORU - L'OR MASAJ MERKEZİ RANDEVU SİSTEMİ
+==========================================
+
+GİRİŞ
+
+Projenin Amacı:
+L'OR Masaj Merkezi için modern, kullanıcı dostu ve kapsamlı bir randevu yönetim sistemi geliştirmektir. Bu sistem, masaj merkezinin günlük operasyonlarını dijitalleştirerek, müşteri deneyimini iyileştirmeyi ve işletme verimliliğini artırmayı hedeflemektedir.
+
+Projenin Amacının Açıklanması:
+Masaj merkezlerinin geleneksel olarak kağıt üzerinde veya basit telefon sistemleriyle yürüttüğü randevu yönetimi süreçlerini, modern web teknolojileri kullanarak dijital platforma taşımak temel amaçtır. Bu sistem sayesinde:
+
+• Müşteriler online olarak randevu alabilecek
+• Terapistler müsaitlik durumlarını kolayca yönetebilecek
+• Yöneticiler tüm operasyonları merkezi olarak kontrol edebilecek
+• Randevu çakışmaları önlenecek
+• Müşteri memnuniyeti artacak
+• İşletme verimliliği yükselecek
+
+Projede Gerçekleştirilmesi Beklenenler:
+
+1. Kullanıcı Yönetimi Sistemi:
+   - Müşteri kayıt ve giriş sistemi
+   - Terapist profil yönetimi
+   - Admin paneli ve yetkilendirme sistemi
+   - Güvenli kimlik doğrulama mekanizması
+
+2. Hizmet Yönetimi:
+   - Masaj hizmetlerinin kategorize edilmesi
+   - Fiyat ve süre bilgilerinin yönetimi
+   - Hizmet açıklamaları ve detayları
+   - Hizmet ekleme/düzenleme/silme işlemleri
+
+3. Randevu Sistemi:
+   - Online randevu alma işlemi
+   - Terapist müsaitlik takvimi
+   - Randevu onaylama/iptal etme
+   - Randevu güncelleme ve yeniden planlama
+   - Otomatik hatırlatma sistemi
+
+4. Terapist Yönetimi:
+   - Terapist profil oluşturma
+   - Müsaitlik saatlerinin belirlenmesi
+   - Terapist performans takibi
+   - Profil fotoğrafı ve biyografi yönetimi
+
+5. Admin Paneli:
+   - Tüm sistem verilerinin merkezi yönetimi
+   - Randevu istatistikleri ve raporlama
+   - Kullanıcı yönetimi
+   - Sistem ayarları ve konfigürasyon
+
+6. Bildirim Sistemi:
+   - E-posta ile randevu onayları
+   - SMS hatırlatmaları
+   - Otomatik bildirim gönderimi
+   - Randevu değişiklik bildirimleri
+
+7. Responsive Tasarım:
+   - Mobil uyumlu arayüz
+   - Tablet ve masaüstü optimizasyonu
+   - Modern ve kullanıcı dostu tasarım
+   - Hızlı yükleme süreleri
+
+8. Veri Güvenliği:
+   - Güvenli veri saklama
+   - Şifreli iletişim
+   - KVKK uyumluluğu
+   - Yedekleme sistemi
+
+9. Performans Optimizasyonu:
+   - Hızlı sayfa yükleme
+   - Veritabanı optimizasyonu
+   - Önbellek sistemi
+   - Asenkron işlemler
+
+10. Entegrasyon Özellikleri:
+    - Ödeme sistemi entegrasyonu (gelecek aşama)
+    - Takvim entegrasyonu
+    - Sosyal medya paylaşımı
+    - API geliştirme
+
+==========================================
+GEREKSİNİM ANALİZİ
+==========================================
+
+Arayüz Gereksinimleri:
+
+Kullanıcı Arayüzü Gereksinimleri:
+
+1. Ana Sayfa (HomePage):
+   - Modern ve çekici hero section
+   - Hizmetler hakkında kısa bilgiler
+   - Terapistlerin öne çıkan profilleri
+   - Randevu alma butonu
+   - Responsive tasarım (mobil, tablet, masaüstü)
+
+2. Hizmetler Sayfası (ServicesPage):
+   - Hizmet kartları grid düzeni
+   - Her hizmet için fiyat, süre ve açıklama
+   - Filtreleme ve arama özellikleri
+   - Randevu alma butonu her kartta
+   - Görsel hiyerarşi ve tipografi
+
+3. Terapistler Sayfası (TherapistsPage):
+   - Terapist profil kartları
+   - Profil fotoğrafları ve biyografiler
+   - Uzmanlık alanları
+   - Müsaitlik durumu göstergesi
+   - İletişim bilgileri
+
+4. Randevu Alma Sayfası (BookingPage):
+   - Hizmet seçimi
+   - Terapist seçimi
+   - Tarih ve saat seçimi
+   - Takvim görünümü
+   - Onay formu
+   - Ödeme bilgileri (gelecek aşama)
+
+5. Kullanıcı Profil Sayfası (ProfilePage):
+   - Kişisel bilgi düzenleme
+   - Randevu geçmişi
+   - Favori terapistler
+   - Şifre değiştirme
+   - Hesap ayarları
+
+6. Admin Paneli (AdminDashboard):
+   - Dashboard istatistikleri
+   - Randevu yönetimi
+   - Hizmet yönetimi
+   - Terapist yönetimi
+   - Müsaitlik yönetimi
+   - Raporlama araçları
+
+7. Giriş/Kayıt Sayfası (LoginRegisterPage):
+   - Kullanıcı dostu form tasarımı
+   - Şifremi unuttum özelliği
+   - Sosyal medya ile giriş (gelecek aşama)
+   - Doğrulama mesajları
+   - Güvenlik göstergeleri
+
+8. Randevu Yönetimi Sayfası (AppointmentManagementPage):
+   - Aktif randevular listesi
+   - Geçmiş randevular
+   - Randevu iptal etme
+   - Randevu güncelleme
+   - Detaylı randevu bilgileri
+
+Fonksiyonel Gereksinimler:
+
+1. Kullanıcı Yönetimi:
+   - Kullanıcı kayıt olma
+   - Kullanıcı giriş yapma
+   - Şifre sıfırlama
+   - Profil güncelleme
+   - Kullanıcı rolleri (Admin, Terapist, Müşteri)
+   - Oturum yönetimi
+
+2. Hizmet Yönetimi:
+   - Hizmet ekleme
+   - Hizmet düzenleme
+   - Hizmet silme
+   - Hizmet kategorileri
+   - Fiyat güncelleme
+   - Süre yönetimi
+
+3. Terapist Yönetimi:
+   - Terapist profil oluşturma
+   - Müsaitlik saatleri belirleme
+   - Profil fotoğrafı yükleme
+   - Biyografi düzenleme
+   - Uzmanlık alanları
+   - İletişim bilgileri
+
+4. Randevu Sistemi:
+   - Online randevu alma
+   - Randevu onaylama
+   - Randevu iptal etme
+   - Randevu güncelleme
+   - Randevu geçmişi görüntüleme
+   - Çakışma kontrolü
+
+5. Müsaitlik Yönetimi:
+   - Terapist müsaitlik ekleme
+   - Müsaitlik düzenleme
+   - Müsaitlik silme
+   - Takvim görünümü
+   - Zaman dilimi yönetimi
+   - Otomatik müsaitlik kontrolü
+
+6. Bildirim Sistemi:
+   - E-posta bildirimleri
+   - SMS bildirimleri (gelecek aşama)
+   - Randevu onay bildirimleri
+   - Hatırlatma bildirimleri
+   - İptal bildirimleri
+
+7. Admin Fonksiyonları:
+   - Tüm kullanıcıları görüntüleme
+   - Sistem istatistikleri
+   - Raporlama araçları
+   - Yedekleme yönetimi
+   - Sistem ayarları
+   - Log yönetimi
+
+8. Arama ve Filtreleme:
+   - Hizmet arama
+   - Terapist arama
+   - Tarih bazlı filtreleme
+   - Fiyat bazlı filtreleme
+   - Uzmanlık bazlı filtreleme
+
+9. Veri Yönetimi:
+   - Veritabanı yedekleme
+   - Veri dışa aktarma
+   - Veri içe aktarma
+   - Veri temizleme
+   - Arşivleme
+
+10. Güvenlik Fonksiyonları:
+    - Şifreli veri saklama
+    - Güvenli API iletişimi
+    - Rate limiting
+    - Input validation
+    - SQL injection koruması
+         - XSS koruması
+
+==========================================
+TASARIM
+==========================================
+
+Mimari Tasarım:
+
+1. Katmanlı Mimari (Layered Architecture):
+   - Sunum Katmanı (Presentation Layer): React.js frontend
+   - İş Mantığı Katmanı (Business Logic Layer): ASP.NET Core Controllers ve Services
+   - Veri Erişim Katmanı (Data Access Layer): Entity Framework Core
+   - Veritabanı Katmanı (Database Layer): SQL Server
+
+2. Model-View-Controller (MVC) Pattern:
+   - Model: Entity Framework Core modelleri (User, Service, Therapist, Appointment, vb.)
+   - View: React.js bileşenleri ve sayfaları
+   - Controller: ASP.NET Core API Controller'ları
+
+3. Repository Pattern:
+   - Veri erişim işlemlerinin soyutlanması
+   - Test edilebilir kod yapısı
+   - Loose coupling (gevşek bağlılık)
+
+4. Service Layer Pattern:
+   - İş mantığının ayrılması
+   - Kod tekrarının önlenmesi
+   - Maintainability (sürdürülebilirlik)
+
+5. RESTful API Tasarımı:
+   - HTTP metodlarının doğru kullanımı (GET, POST, PUT, DELETE)
+   - Resource-based URL yapısı
+   - Stateless (durumsuz) iletişim
+
+6. Client-Server Architecture:
+   - Frontend (React.js) - Client tarafı
+   - Backend (ASP.NET Core) - Server tarafı
+   - JSON formatında veri alışverişi
+
+7. Microservices Hazırlığı:
+   - Modüler yapı
+   - Bağımsız servisler
+   - Gelecekte microservices'e geçiş kolaylığı
+
+Kullanılacak Teknolojiler:
+
+1. Backend Teknolojileri:
+   - **Programlama Dili**: C# (.NET 8.0)
+   - **Framework**: ASP.NET Core Web API
+   - **ORM**: Entity Framework Core
+   - **Veritabanı**: Microsoft SQL Server
+   - **Authentication**: JWT (JSON Web Tokens)
+   - **Validation**: FluentValidation
+   - **Logging**: Serilog
+   - **CORS**: Cross-Origin Resource Sharing
+
+2. Frontend Teknolojileri:
+   - **Programlama Dili**: JavaScript/TypeScript
+   - **Framework**: React.js (18.x)
+   - **UI Library**: Material-UI (MUI)
+   - **State Management**: React Hooks (useState, useEffect)
+   - **Routing**: React Router DOM
+   - **HTTP Client**: Fetch API
+   - **Date/Time**: Day.js
+   - **Animations**: Framer Motion
+
+3. Harici Kütüphaneler ve Araçlar:
+
+Backend Kütüphaneleri:
+   - **Microsoft.EntityFrameworkCore**: ORM için
+   - **Microsoft.EntityFrameworkCore.SqlServer**: SQL Server provider
+   - **Microsoft.AspNetCore.Authentication.JwtBearer**: JWT authentication
+   - **AutoMapper**: Object mapping
+   - **Swashbuckle.AspNetCore**: API documentation (Swagger)
+   - **Microsoft.AspNetCore.Cors**: CORS policy
+   - **System.Text.Json**: JSON serialization
+
+Frontend Kütüphaneleri:
+   - **@mui/material**: Material-UI components
+   - **@mui/icons-material**: Material icons
+   - **@emotion/react & @emotion/styled**: CSS-in-JS
+   - **react-router-dom**: Client-side routing
+   - **dayjs**: Date manipulation
+   - **framer-motion**: Animations
+   - **axios**: HTTP client (alternatif)
+
+4. Geliştirme Araçları:
+   - **IDE**: Visual Studio Code
+   - **Package Manager**: NuGet (Backend), npm (Frontend)
+   - **Version Control**: Git
+   - **Database Management**: SQL Server Management Studio
+   - **API Testing**: Postman / Swagger UI
+   - **Code Quality**: ESLint, Prettier (Frontend)
+
+5. Deployment ve Hosting:
+   - **Backend Hosting**: Azure App Service / IIS
+   - **Frontend Hosting**: Azure Static Web Apps / Netlify
+   - **Database Hosting**: Azure SQL Database
+   - **File Storage**: Azure Blob Storage (resimler için)
+   - **CI/CD**: GitHub Actions / Azure DevOps
+
+6. Güvenlik Teknolojileri:
+   - **Password Hashing**: BCrypt
+   - **JWT Token**: Stateless authentication
+   - **HTTPS**: SSL/TLS encryption
+   - **Input Validation**: Server-side validation
+   - **SQL Injection Protection**: Entity Framework parameterized queries
+   - **XSS Protection**: React's built-in XSS protection
+
+7. Performans Optimizasyonu:
+   - **Caching**: In-memory caching
+   - **Database Indexing**: Optimized queries
+   - **Lazy Loading**: React component lazy loading
+   - **Image Optimization**: Compressed images
+   - **Bundle Optimization**: Webpack optimization
+
+8. Monitoring ve Logging:
+   - **Application Insights**: Azure monitoring
+   - **Serilog**: Structured logging
+   - **Error Tracking**: Global exception handling
+   - **Performance Monitoring**: Response time tracking
+
+==========================================
+VERİ TABANI TASARIMI
+==========================================
+
+Veritabanı Tasarımı:
+
+L'OR Masaj Merkezi Randevu Sistemi, Microsoft SQL Server veritabanı kullanmaktadır. Veritabanı tasarımı Entity Framework Core Code-First yaklaşımı ile gerçekleştirilmiştir.
+
+Ana Tablolar ve İlişkiler:
+
+1. Users Tablosu:
+   - Kullanıcı kimlik bilgileri ve rol yönetimi
+   - Email ve şifre hash'i ile güvenli kimlik doğrulama
+   - Role alanı ile admin, terapist, müşteri ayrımı
+
+2. Customers Tablosu:
+   - Müşteri bilgileri (ad, soyad, telefon, email)
+   - Randevu alma işlemleri için gerekli bilgiler
+
+3. Therapists Tablosu:
+   - Terapist profil bilgileri (ad, biyografi, profil resmi)
+   - Users tablosu ile one-to-one ilişki
+   - Müsaitlik ve randevu yönetimi
+
+4. Services Tablosu:
+   - Hizmet bilgileri (ad, açıklama, fiyat, süre)
+   - Sabit hizmet katalogu
+
+5. AvailabilitySlots Tablosu:
+   - Terapist müsaitlik zamanları
+   - StartTime ve EndTime ile zaman yönetimi
+   - IsBooked ile rezervasyon durumu
+
+6. Appointments Tablosu:
+   - Randevu kayıtları
+   - Çoklu foreign key ilişkileri
+   - Müşteri, terapist, hizmet ve müsaitlik bağlantıları
+
+7. UserFavoriteTherapists Tablosu:
+   - Kullanıcı favori terapist ilişkisi
+   - Many-to-many ilişki tablosu
+
+ER Diyagramı Kodu:
+(er-diagram.puml dosyasında bulunmaktadır)
+
+==========================================
+KULLANICI ARAYÜZÜ TASARIMI
+==========================================
+
+Kullanıcı Arayüzü Tasarımı:
+
+L'OR Masaj Merkezi Randevu Sistemi, modern ve kullanıcı dostu bir arayüze sahiptir. React.js ve Material-UI (MUI) kullanılarak geliştirilmiştir.
+
+Ana Sayfalar ve Özellikleri:
+
+1. Ana Sayfa (HomePage):
+   - Hero bölümü ile karşılama mesajı
+   - Hizmet kartları ile hızlı erişim
+   - Terapist öne çıkanlar
+   - Responsive tasarım
+
+2. Hizmetler Sayfası (ServicesPage):
+   - Grid layout ile hizmet kartları
+   - Her kartta hizmet adı, açıklama, fiyat, süre
+   - Tutarlı kart boyutları (320px yükseklik)
+   - Hover efektleri ve modern tasarım
+
+3. Terapistler Sayfası (TherapistsPage):
+   - Terapist profil kartları
+   - Profil resmi, ad, biyografi
+   - Favori ekleme/çıkarma özelliği
+   - Detaylı terapist bilgileri
+
+4. Randevu Alma Sayfası (BookingPage):
+   - Takvim bileşeni ile tarih seçimi
+   - Terapist ve hizmet seçimi
+   - Müsait saat görüntüleme
+   - Form validasyonu
+
+5. Profil Sayfası (ProfilePage):
+   - Kullanıcı bilgileri düzenleme
+   - Randevu geçmişi görüntüleme
+   - Favori terapistler listesi
+   - Şifre değiştirme
+
+6. Admin Paneli (AdminDashboard):
+   - Dashboard istatistikleri
+   - Randevu yönetimi
+   - Hizmet ekleme/düzenleme
+   - Terapist yönetimi
+   - Müsaitlik yönetimi
+
+7. Giriş/Kayıt Sayfası (LoginRegisterPage):
+   - Tab yapısı ile giriş/kayıt
+   - Form validasyonu
+   - Hata mesajları
+   - Responsive tasarım
+
+Tasarım Prensipleri:
+
+1. Material Design:
+   - Google Material Design prensipleri
+   - Tutarlı renk paleti
+   - Typography hiyerarşisi
+   - Elevation ve gölge efektleri
+
+2. Responsive Tasarım:
+   - Mobile-first yaklaşım
+   - Breakpoint'ler ile uyumluluk
+   - Grid sistem kullanımı
+   - Esnek layout yapısı
+
+3. Kullanıcı Deneyimi:
+   - Sezgisel navigasyon
+   - Hızlı yükleme süreleri
+   - Loading state'leri
+   - Error handling
+
+4. Erişilebilirlik:
+   - ARIA etiketleri
+   - Klavye navigasyonu
+   - Renk kontrastı
+   - Screen reader uyumluluğu
+
+Ekran Çıktıları ve Açıklamalar:
+
+1. Ana Sayfa:
+   - Hero bölümü: Büyük başlık ve çağrı-to-action butonu
+   - Hizmet kartları: 4 sütunlu grid layout
+   - Terapist öne çıkanlar: Profil kartları
+
+2. Hizmetler Sayfası:
+   - 3 sütunlu grid layout (lg={3})
+   - Sabit kart yüksekliği (320px)
+   - Fiyat ve süre bilgileri chip'ler halinde
+   - "Randevu Al" butonu
+
+3. Admin Paneli:
+   - İstatistik kartları üst kısımda
+   - Tab yapısı ile farklı yönetim bölümleri
+   - Data table'lar ile liste görünümleri
+   - Form'lar ile ekleme/düzenleme
+
+==========================================
+UYGULAMANIN ÇALIŞTIRILMASI
+==========================================
+
+Uygulamanın Çalıştırılması:
+
+1. Gereksinimler:
+   - .NET 8.0 SDK
+   - Node.js 16+ ve npm
+   - SQL Server (LocalDB veya Express)
+   - Visual Studio 2022 veya VS Code
+
+2. Backend Çalıştırma:
+   ```bash
+   cd WebApplication1
+   dotnet restore
+   dotnet ef database update
+   dotnet run
+   ```
+   - Backend http://localhost:5058 adresinde çalışır
+   - Swagger UI: http://localhost:5058/swagger
+
+3. Frontend Çalıştırma:
+   ```bash
+   cd WebApplication1/ClientApp
+   npm install
+   npm start
+   ```
+   - Frontend http://localhost:3000 adresinde çalışır
+   - Proxy ayarı ile backend'e otomatik yönlendirme
+
+4. Veritabanı Kurulumu:
+   - İlk çalıştırmada migration'lar otomatik uygulanır
+   - Seed data ile örnek veriler yüklenir
+   - Admin kullanıcısı: admin@lor.com / admin123
+
+5. Geliştirme Ortamı:
+   - Hot reload aktif (frontend)
+   - Debug modunda çalışma
+   - Console log'ları ile hata takibi
+   - Browser developer tools
+
+6. Production Deployment:
+   - Backend: Azure App Service
+   - Frontend: Azure Static Web Apps
+   - Database: Azure SQL Database
+   - CI/CD: GitHub Actions
+
+7. Test Kullanıcıları:
+   - Admin: admin@lor.com / admin123
+   - Terapist: therapist@lor.com / therapist123
+   - Müşteri: customer@lor.com / customer123
+
+8. Önemli Notlar:
+   - CORS ayarları yapılandırılmış
+   - JWT token authentication aktif
+   - Timezone ayarları Türkiye için optimize edilmiş
+   - File upload için wwwroot klasörü kullanılıyor

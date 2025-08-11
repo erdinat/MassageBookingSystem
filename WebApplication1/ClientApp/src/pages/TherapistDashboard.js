@@ -692,46 +692,193 @@ function TherapistDashboard() {
 
         {/* Availability Dialog */}
         <Dialog open={availabilityDialog} onClose={() => setAvailabilityDialog(false)} maxWidth="sm" fullWidth>
-          <DialogTitle>Yeni Müsaitlik Ekle</DialogTitle>
-          <DialogContent>
-            <Grid container spacing={2} sx={{ mt: 1 }}>
+          <DialogTitle sx={{ 
+            backgroundColor: '#F5F1E8', 
+            color: '#8B6F47', 
+            fontWeight: 'bold',
+            borderBottom: '2px solid #D4B896',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1
+          }}>
+            <ScheduleIcon sx={{ color: '#8B6F47' }} />
+            Yeni Müsaitlik Ekle
+          </DialogTitle>
+          <DialogContent sx={{ backgroundColor: '#F5F1E8', pt: 3, pb: 2 }}>
+            <Grid container spacing={2} direction="column">
               <Grid item xs={12}>
-                <DatePicker
-                  label="Tarih"
-                  value={availabilityForm.date}
-                  onChange={(newValue) => setAvailabilityForm({ ...availabilityForm, date: newValue })}
-                  renderInput={(params) => <TextField {...params} fullWidth />}
-                  minDate={dayjs()}
-                />
+                <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="tr">
+                  <DatePicker
+                    label="Tarih *"
+                    value={availabilityForm.date}
+                    onChange={(newValue) => {
+                      if (newValue) {
+                        const startTime = newValue.hour(9).minute(0); // Varsayılan 09:00
+                        const endTime = newValue.hour(10).minute(0);   // Varsayılan 10:00
+                        setAvailabilityForm({ 
+                          ...availabilityForm, 
+                          date: newValue,
+                          startTime: startTime,
+                          endTime: endTime
+                        });
+                      }
+                    }}
+                    minDate={dayjs()}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        required: true,
+                        sx: {
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': {
+                              borderColor: '#D4B896',
+                            },
+                            '&:hover fieldset': {
+                              borderColor: '#8B6F47',
+                            },
+                            '&.Mui-focused fieldset': {
+                              borderColor: '#8B6F47',
+                            },
+                          },
+                        }
+                      }
+                    }}
+                  />
+                </LocalizationProvider>
               </Grid>
-              <Grid item xs={12} sm={6}>
-                <TimePicker
-                  label="Başlangıç Saati"
-                  value={availabilityForm.startTime}
-                  onChange={(newValue) => setAvailabilityForm({ ...availabilityForm, startTime: newValue })}
-                  renderInput={(params) => <TextField {...params} fullWidth />}
-                />
+              
+              <Grid item xs={12}>
+                <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="tr">
+                  <TimePicker
+                    label="Başlangıç Saati *"
+                    value={availabilityForm.startTime}
+                    onChange={(newValue) => {
+                      if (newValue && availabilityForm.date) {
+                        const updatedStartTime = availabilityForm.date.hour(newValue.hour()).minute(newValue.minute());
+                        const updatedEndTime = updatedStartTime.add(1, 'hour'); // 1 saat sonrası
+                        setAvailabilityForm({ 
+                          ...availabilityForm, 
+                          startTime: updatedStartTime,
+                          endTime: updatedEndTime
+                        });
+                      }
+                    }}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        required: true,
+                        sx: {
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': {
+                              borderColor: '#D4B896',
+                            },
+                            '&:hover fieldset': {
+                              borderColor: '#8B6F47',
+                            },
+                            '&.Mui-focused fieldset': {
+                              borderColor: '#8B6F47',
+                            },
+                          },
+                        }
+                      }
+                    }}
+                  />
+                </LocalizationProvider>
               </Grid>
-              <Grid item xs={12} sm={6}>
-                <TimePicker
-                  label="Bitiş Saati"
-                  value={availabilityForm.endTime}
-                  onChange={(newValue) => setAvailabilityForm({ ...availabilityForm, endTime: newValue })}
-                  renderInput={(params) => <TextField {...params} fullWidth />}
-                />
+              
+              <Grid item xs={12}>
+                <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="tr">
+                  <TimePicker
+                    label="Bitiş Saati *"
+                    value={availabilityForm.endTime}
+                    onChange={(newValue) => {
+                      if (newValue && availabilityForm.date) {
+                        const updatedEndTime = availabilityForm.date.hour(newValue.hour()).minute(newValue.minute());
+                        setAvailabilityForm({ 
+                          ...availabilityForm, 
+                          endTime: updatedEndTime
+                        });
+                      }
+                    }}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        required: true,
+                        sx: {
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': {
+                              borderColor: '#D4B896',
+                            },
+                            '&:hover fieldset': {
+                              borderColor: '#8B6F47',
+                            },
+                            '&.Mui-focused fieldset': {
+                              borderColor: '#8B6F47',
+                            },
+                          },
+                        }
+                      }
+                    }}
+                  />
+                </LocalizationProvider>
+              </Grid>
+              
+              <Grid item xs={12}>
+                <Box sx={{ 
+                  backgroundColor: '#D4B896', 
+                  p: 2, 
+                  borderRadius: 1,
+                  border: '1px solid #8B6F47'
+                }}>
+                  <Typography variant="body2" sx={{ color: '#8B6F47', fontWeight: 'bold', mb: 1 }}>
+                    💡 Bilgi:
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: '#8B6F47' }}>
+                    • Tarih seçtiğinizde otomatik olarak 09:00-10:00 arası ayarlanır
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: '#8B6F47' }}>
+                    • Başlangıç saatini değiştirdiğinizde bitiş saati 1 saat sonrasına ayarlanır
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: '#8B6F47' }}>
+                    • Bitiş saatini manuel olarak değiştirebilirsiniz
+                  </Typography>
+                </Box>
               </Grid>
             </Grid>
           </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setAvailabilityDialog(false)} startIcon={<CancelIcon />}>İptal</Button>
+          <DialogActions sx={{ 
+            backgroundColor: '#F5F1E8', 
+            p: 3, 
+            borderTop: '2px solid #D4B896',
+            gap: 2
+          }}>
             <Button 
-              onClick={handleAvailabilitySave} 
-              variant="contained" 
-              startIcon={<SaveIcon />}
-              sx={{ backgroundColor: '#8B6F47', '&:hover': { backgroundColor: '#6B5437' } }}
-              disabled={!availabilityForm.date || !availabilityForm.startTime || !availabilityForm.endTime}
+              onClick={() => setAvailabilityDialog(false)} 
+              sx={{ 
+                color: '#8B6F47',
+                border: '1px solid #8B6F47',
+                '&:hover': {
+                  backgroundColor: '#8B6F47',
+                  color: 'white'
+                }
+              }}
             >
-              Kaydet
+              İptal
+            </Button>
+            <Button 
+              onClick={handleAvailabilitySave}
+              variant="contained"
+              disabled={!availabilityForm.date || !availabilityForm.startTime || !availabilityForm.endTime}
+              sx={{ 
+                backgroundColor: '#8B6F47', 
+                '&:hover': { backgroundColor: '#6B5437' },
+                '&:disabled': {
+                  backgroundColor: '#D4B896',
+                  color: '#8B6F47'
+                }
+              }}
+            >
+              Ekle
             </Button>
           </DialogActions>
         </Dialog>

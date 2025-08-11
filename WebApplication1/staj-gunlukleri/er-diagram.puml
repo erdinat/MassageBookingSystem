@@ -1,0 +1,102 @@
+@startuml LOR_Masaj_Merkezi_ERDiagram
+
+!theme plain
+skinparam entity {
+    BackgroundColor LightYellow
+    BorderColor DarkOrange
+    FontSize 11
+}
+
+title L'OR Masaj Merkezi Randevu Sistemi - ER Diyagramı
+
+entity "Users" {
+    * Id : int (PK)
+    --
+    Name : string
+    Email : string
+    PasswordHash : string
+    Role : string
+    CreatedAt : datetime
+    UpdatedAt : datetime
+}
+
+entity "Customers" {
+    * Id : int (PK)
+    --
+    Name : string
+    Surname : string
+    Phone : string
+    Email : string
+    CreatedAt : datetime
+    UpdatedAt : datetime
+}
+
+entity "Therapists" {
+    * Id : int (PK)
+    --
+    Name : string
+    Bio : string
+    ProfilePictureUrl : string
+    UserId : int (FK)
+    CreatedAt : datetime
+    UpdatedAt : datetime
+}
+
+entity "Services" {
+    * Id : int (PK)
+    --
+    Name : string
+    Description : string
+    Price : decimal
+    DurationMinutes : int
+    CreatedAt : datetime
+    UpdatedAt : datetime
+}
+
+entity "AvailabilitySlots" {
+    * Id : int (PK)
+    --
+    TherapistId : int (FK)
+    StartTime : datetime
+    EndTime : datetime
+    IsBooked : boolean
+    CreatedAt : datetime
+    UpdatedAt : datetime
+}
+
+entity "Appointments" {
+    * Id : int (PK)
+    --
+    UserId : int (FK)
+    CustomerId : int (FK)
+    TherapistId : int (FK)
+    ServiceId : int (FK)
+    AvailabilitySlotId : int (FK)
+    CreatedAt : datetime
+    UpdatedAt : datetime
+}
+
+entity "UserFavoriteTherapists" {
+    * Id : int (PK)
+    --
+    UserId : int (FK)
+    TherapistId : int (FK)
+    CreatedAt : datetime
+}
+
+' İlişkiler
+Users ||--o{ Therapists : "has"
+Users ||--o{ Appointments : "creates"
+Users ||--o{ UserFavoriteTherapists : "favorites"
+
+Customers ||--o{ Appointments : "books"
+
+Therapists ||--o{ AvailabilitySlots : "provides"
+Therapists ||--o{ Appointments : "performs"
+Therapists ||--o{ UserFavoriteTherapists : "favorited_by"
+
+Services ||--o{ Appointments : "included_in"
+
+AvailabilitySlots ||--|| Appointments : "booked_for"
+
+@enduml

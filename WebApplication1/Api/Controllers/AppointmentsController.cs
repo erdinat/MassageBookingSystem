@@ -61,8 +61,8 @@ namespace WebApplication1.Api.Controllers
                     AvailabilitySlot = new
                     {
                         a.AvailabilitySlot.Id,
-                        a.AvailabilitySlot.StartTime,
-                        a.AvailabilitySlot.EndTime,
+                        StartTime = DateTime.SpecifyKind(a.AvailabilitySlot.StartTime, DateTimeKind.Utc),
+                        EndTime = DateTime.SpecifyKind(a.AvailabilitySlot.EndTime, DateTimeKind.Utc),
                         a.AvailabilitySlot.IsBooked
                     }
                 })
@@ -128,8 +128,8 @@ namespace WebApplication1.Api.Controllers
                     AvailabilitySlot = new
                     {
                         a.AvailabilitySlot.Id,
-                        a.AvailabilitySlot.StartTime,
-                        a.AvailabilitySlot.EndTime,
+                        StartTime = DateTime.SpecifyKind(a.AvailabilitySlot.StartTime, DateTimeKind.Utc),
+                        EndTime = DateTime.SpecifyKind(a.AvailabilitySlot.EndTime, DateTimeKind.Utc),
                         a.AvailabilitySlot.IsBooked
                     }
                 })
@@ -180,8 +180,8 @@ namespace WebApplication1.Api.Controllers
                     AvailabilitySlot = new
                     {
                         a.AvailabilitySlot.Id,
-                        a.AvailabilitySlot.StartTime,
-                        a.AvailabilitySlot.EndTime,
+                        StartTime = DateTime.SpecifyKind(a.AvailabilitySlot.StartTime, DateTimeKind.Utc),
+                        EndTime = DateTime.SpecifyKind(a.AvailabilitySlot.EndTime, DateTimeKind.Utc),
                         a.AvailabilitySlot.IsBooked
                     }
                 })
