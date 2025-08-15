@@ -747,7 +747,7 @@ function TherapistDashboard() {
                 </LocalizationProvider>
               </Grid>
               
-              <Grid item xs={12}>
+              <Grid item xs={6}>
                 <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="tr">
                   <TimePicker
                     label="Başlangıç Saati *"
@@ -786,7 +786,7 @@ function TherapistDashboard() {
                 </LocalizationProvider>
               </Grid>
               
-              <Grid item xs={12}>
+              <Grid item xs={6}>
                 <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="tr">
                   <TimePicker
                     label="Bitiş Saati *"

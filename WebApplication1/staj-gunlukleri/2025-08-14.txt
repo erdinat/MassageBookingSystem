@@ -1,0 +1,416 @@
+STAJ DEFTERİ - 14 AĞUSTOS 2025
+
+==========================================
+GÜNLÜK ÇALIŞMA RAPORU
+==========================================
+
+TARİH: 14 Ağustos 2025
+ÇALIŞMA SAATİ: 09:00 - 17:00
+TOPLAM SAAT: 8 saat
+
+==========================================
+YAPILAN İŞLER
+==========================================
+
+1. UML DİYAGRAMLARI OLUŞTURMA:
+   - Use Case diyagramı oluşturuldu (use-case-diagram.puml)
+   - Module diyagramı oluşturuldu (module-diagram.puml)
+   - ER diyagramı oluşturuldu (er-diagram.puml)
+   - Domain diyagramı oluşturuldu (domain-diagram.puml)
+   - PlantUML syntax kullanılarak profesyonel diyagramlar
+
+2. USE CASE DİYAGRAMI İYİLEŞTİRMELERİ:
+   - İlk versiyon çok karmaşık ve uzun isimler içeriyordu
+   - Daha kompakt ve anlaşılır hale getirildi
+   - Aktörler sol tarafta, use case'ler sağ tarafta
+   - Kısa ve öz use case isimleri kullanıldı
+   - Görsel düzen iyileştirildi
+
+3. DOMAIN DİYAGRAMI TASARIMI:
+   - Yeşil tema yerine beyaz tema kullanıldı
+   - Mavi vurgular (#1976D2) eklendi
+   - Yuvarlatılmış köşeler (RoundCorner) eklendi
+   - Modern font (Arial) kullanıldı
+   - Profesyonel görünüm sağlandı
+
+4. MODULE DİYAGRAMI DETAYLANDIRMA:
+   - Frontend, Backend, Database modülleri
+   - Her modülün alt bileşenleri
+   - Modüller arası ilişkiler
+   - Teknoloji stack'i gösterimi
+   - Mimari yapı açıklaması
+
+5. ER DİYAGRAMI İLİŞKİLERİ:
+   - Tüm tablolar ve ilişkiler
+   - Foreign key bağlantıları
+   - Cardinality (1:1, 1:N, M:N)
+   - Primary key'ler
+   - Veritabanı şeması
+
+6. DİYAGRAM DOKÜMANTASYONU:
+   - Her diyagram için açıklamalar
+   - Kullanım amaçları
+   - Teknik detaylar
+   - Görsel iyileştirmeler
+
+==========================================
+TEKNİK DETAYLAR
+==========================================
+
+1. Use Case Diyagramı İyileştirmeleri:
+```plantuml
+@startuml
+!theme plain
+skinparam backgroundColor white
+skinparam actor {
+    BackgroundColor #E3F2FD
+    BorderColor #1976D2
+    FontColor #1976D2
+    FontSize 12
+    FontName Arial
+    BorderThickness 2
+    RoundCorner 8
+}
+
+skinparam usecase {
+    BackgroundColor white
+    BorderColor #1976D2
+    FontColor #333333
+    FontSize 11
+    FontName Arial
+    BorderThickness 2
+    RoundCorner 6
+}
+
+actor "Müşteri" as Customer
+actor "Terapist" as Therapist
+actor "Admin" as Admin
+
+rectangle "L'OR Masaj Merkezi Randevu Sistemi" {
+    usecase "Giriş Yap" as Login
+    usecase "Randevu Al" as BookAppointment
+    usecase "Randevu Görüntüle" as ViewAppointments
+    usecase "Müsaitlik Ekle" as AddAvailability
+    usecase "Hizmet Yönet" as ManageServices
+    usecase "Rapor Görüntüle" as ViewReports
+}
+
+Customer --> Login
+Customer --> BookAppointment
+Customer --> ViewAppointments
+Therapist --> Login
+Therapist --> AddAvailability
+Admin --> Login
+Admin --> ManageServices
+Admin --> ViewReports
+@enduml
+```
+
+2. Domain Diyagramı Tasarımı:
+```plantuml
+@startuml
+!theme plain
+skinparam backgroundColor white
+skinparam class {
+    BackgroundColor white
+    BorderColor #1976D2
+    ArrowColor #1976D2
+    FontColor #333333
+    FontSize 12
+    FontName Arial
+    BorderThickness 2
+    RoundCorner 10
+}
+
+skinparam enum {
+    BackgroundColor #E3F2FD
+    BorderColor #1976D2
+    FontColor #1976D2
+    FontSize 11
+    FontName Arial
+    BorderThickness 1
+    RoundCorner 8
+}
+
+skinparam title {
+    FontColor #1976D2
+    FontSize 18
+    FontName Arial
+    FontStyle bold
+}
+
+title L'OR Masaj Merkezi - Domain Model
+
+class User {
+    +Id: int
+    +Name: string
+    +Email: string
+    +PasswordHash: string
+    +Role: UserRole
+    +CreatedAt: DateTime
+}
+
+class Customer {
+    +Id: int
+    +Name: string
+    +Surname: string
+    +Phone: string
+    +Email: string
+}
+
+class Therapist {
+    +Id: int
+    +Name: string
+    +Bio: string
+    +ProfilePictureUrl: string
+    +UserId: int
+}
+
+class Service {
+    +Id: int
+    +Name: string
+    +Description: string
+    +Price: decimal
+    +DurationMinutes: int
+}
+
+class Appointment {
+    +Id: int
+    +CustomerId: int
+    +TherapistId: int
+    +ServiceId: int
+    +AvailabilitySlotId: int
+    +UserId: int
+    +CreatedAt: DateTime
+}
+
+class AvailabilitySlot {
+    +Id: int
+    +TherapistId: int
+    +StartTime: DateTime
+    +EndTime: DateTime
+    +IsBooked: bool
+}
+
+enum UserRole {
+    Admin
+    Therapist
+    Customer
+}
+
+User ||--o{ Appointment : creates
+Customer ||--o{ Appointment : books
+Therapist ||--o{ Appointment : provides
+Service ||--o{ Appointment : includes
+AvailabilitySlot ||--o{ Appointment : schedules
+User ||--|| Therapist : has_profile
+@enduml
+```
+
+3. Module Diyagramı Detayları:
+```plantuml
+@startuml
+!theme plain
+skinparam backgroundColor white
+skinparam package {
+    BackgroundColor #E3F2FD
+    BorderColor #1976D2
+    FontColor #1976D2
+    FontSize 12
+    FontName Arial
+    BorderThickness 2
+    RoundCorner 8
+}
+
+package "Frontend (React.js)" {
+    [Pages] as Pages
+    [Components] as Components
+    [Services] as Services
+    [Utils] as Utils
+}
+
+package "Backend (ASP.NET Core)" {
+    [Controllers] as Controllers
+    [Services] as BackendServices
+    [Models] as Models
+    [Data] as Data
+}
+
+package "Database (SQL Server)" {
+    [Users] as UsersTable
+    [Customers] as CustomersTable
+    [Therapists] as TherapistsTable
+    [Services] as ServicesTable
+    [Appointments] as AppointmentsTable
+    [AvailabilitySlots] as AvailabilityTable
+}
+
+Pages --> Components
+Components --> Services
+Services --> Controllers
+Controllers --> BackendServices
+BackendServices --> Models
+Models --> Data
+Data --> UsersTable
+Data --> CustomersTable
+Data --> TherapistsTable
+Data --> ServicesTable
+Data --> AppointmentsTable
+Data --> AvailabilityTable
+@enduml
+```
+
+4. ER Diyagramı İlişkileri:
+```plantuml
+@startuml
+!theme plain
+skinparam backgroundColor white
+skinparam entity {
+    BackgroundColor white
+    BorderColor #1976D2
+    FontColor #333333
+    FontSize 11
+    FontName Arial
+    BorderThickness 2
+    RoundCorner 6
+}
+
+entity "Users" {
+    * Id : int <<PK>>
+    --
+    * Name : string
+    * Email : string
+    * PasswordHash : string
+    * Role : UserRole
+    * CreatedAt : DateTime
+}
+
+entity "Customers" {
+    * Id : int <<PK>>
+    --
+    * Name : string
+    * Surname : string
+    * Phone : string
+    * Email : string
+}
+
+entity "Therapists" {
+    * Id : int <<PK>>
+    --
+    * Name : string
+    * Bio : string
+    * ProfilePictureUrl : string
+    * UserId : int <<FK>>
+}
+
+entity "Services" {
+    * Id : int <<PK>>
+    --
+    * Name : string
+    * Description : string
+    * Price : decimal
+    * DurationMinutes : int
+}
+
+entity "Appointments" {
+    * Id : int <<PK>>
+    --
+    * CustomerId : int <<FK>>
+    * TherapistId : int <<FK>>
+    * ServiceId : int <<FK>>
+    * AvailabilitySlotId : int <<FK>>
+    * UserId : int <<FK>>
+    * CreatedAt : DateTime
+}
+
+entity "AvailabilitySlots" {
+    * Id : int <<PK>>
+    --
+    * TherapistId : int <<FK>>
+    * StartTime : DateTime
+    * EndTime : DateTime
+    * IsBooked : bool
+}
+
+Users ||--|| Therapists : has_profile
+Customers ||--o{ Appointments : books
+Therapists ||--o{ Appointments : provides
+Services ||--o{ Appointments : includes
+AvailabilitySlots ||--o{ Appointments : schedules
+@enduml
+```
+
+==========================================
+KARŞILAŞILAN SORUNLAR
+==========================================
+
+1. Use Case Diyagramı Karmaşıklığı:
+   - Sorun: İlk versiyon çok uzun ve karmaşık isimler içeriyordu
+   - Çözüm: Kısa ve öz isimler kullanıldı, görsel düzen iyileştirildi
+
+2. Domain Diyagramı Tema:
+   - Sorun: Yeşil tema profesyonel görünmüyordu
+   - Çözüm: Beyaz tema ve mavi vurgular kullanıldı
+
+3. PlantUML Syntax:
+   - Sorun: Bazı skinparam ayarları çalışmıyordu
+   - Çözüm: Doğru syntax ve tema ayarları kullanıldı
+
+4. Diyagram Düzeni:
+   - Sorun: İlişkiler karışık görünüyordu
+   - Çözüm: Mantıklı gruplandırma ve düzenleme yapıldı
+
+==========================================
+ÖĞRENİLEN KONULAR
+==========================================
+
+1. PlantUML Syntax:
+   - Diyagram oluşturma teknikleri
+   - Skinparam ayarları
+   - Tema konfigürasyonu
+   - İlişki gösterimi
+
+2. UML Diyagram Türleri:
+   - Use Case diyagramları
+   - Domain diyagramları
+   - Module diyagramları
+   - ER diyagramları
+
+3. Görsel Tasarım:
+   - Renk paleti seçimi
+   - Font ve boyut ayarları
+   - Layout düzenleme
+   - Profesyonel görünüm
+
+4. Sistem Mimarisi:
+   - Modüler yapı tasarımı
+   - İlişki modelleme
+   - Teknoloji stack gösterimi
+   - Mimari dokümantasyon
+
+==========================================
+YARIN YAPILACAK İŞLER
+==========================================
+
+1. MSSQL sunum materyalleri hazırlanacak
+2. SQL sorgu örnekleri oluşturulacak
+3. Gamma AI sunum prompt'ları hazırlanacak
+4. Demo veriler oluşturulacak
+5. Sunum planı detaylandırılacak
+
+==========================================
+NOTLAR
+==========================================
+
+- UML diyagramları başarıyla oluşturuldu
+- Görsel tasarım profesyonel hale getirildi
+- Sistem mimarisi net bir şekilde dokümante edildi
+- PlantUML kullanımı öğrenildi
+- Proje dokümantasyonu tamamlandı
+
+==========================================
+İMZA
+==========================================
+
+Tarih: 14 Ağustos 2025
+İmza: _________________

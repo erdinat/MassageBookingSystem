@@ -1,0 +1,207 @@
+STAJ DEFTERİ - 11 AĞUSTOS 2025
+
+==========================================
+GÜNLÜK ÇALIŞMA RAPORU
+==========================================
+
+TARİH: 11 Ağustos 2025
+ÇALIŞMA SAATİ: 09:00 - 17:00
+TOPLAM SAAT: 8 saat
+
+==========================================
+YAPILAN İŞLER
+==========================================
+
+1. LOGIN PERSISTENCE SORUNU ÇÖZÜMÜ:
+   - Kullanıcı giriş yaptıktan sonra sayfa yenilenmeden login durumu kayboluyordu
+   - App.js'de localStorage yönetimi iyileştirildi
+   - Custom event sistemi eklendi
+   - LoginRegisterPage.js'de userStateChanged event'i dispatch edildi
+
+2. ADMIN DASHBOARD INITIALIZATION HATASI:
+   - "Cannot access 'loadDashboardData' before initialization" hatası çözüldü
+   - useCallback hook'ları eklendi
+   - useEffect dependency array'leri düzeltildi
+   - Function hoisting sorunları giderildi
+
+3. TIMEZONE SORUNLARI ÇÖZÜMÜ:
+   - AvailabilityController.cs'de DateTimeKind ayarları düzeltildi
+   - Türkiye timezone'u için özel konfigürasyon eklendi
+   - Frontend'de dayjs.utc() kullanımı yaygınlaştırıldı
+   - 3 saatlik fark sorunu çözüldü
+
+4. KULLANICI ARAYÜZÜ İYİLEŞTİRMELERİ:
+   - Admin panelinde availability dialog tasarımı iyileştirildi
+   - DialogTitle'a icon ve styling eklendi
+   - Input field'larına border styling eklendi
+   - Button hover efektleri eklendi
+
+5. VERİTABANI SEED İŞLEMLERİ:
+   - Test kullanıcıları için reset-password endpoint'i eklendi
+   - Örnek veriler güncellendi
+   - Veritabanı temizleme ve yeniden oluşturma işlemleri
+
+6. FRONTEND PERFORMANS İYİLEŞTİRMELERİ:
+   - React Hook dependency warning'leri düzeltildi
+   - useCallback kullanımı yaygınlaştırıldı
+   - Gereksiz re-render'lar önlendi
+   - Memory leak'ler giderildi
+
+==========================================
+TEKNİK DETAYLAR
+==========================================
+
+1. Login Persistence Çözümü:
+```javascript
+// App.js
+useEffect(() => {
+    const updateUserState = () => {
+        try {
+            const userData = JSON.parse(localStorage.getItem('user') || 'null');
+            setUser(userData);
+        } catch (error) {
+            console.error('Error parsing user from localStorage:', error);
+            setUser(null);
+        }
+    };
+
+    updateUserState(); // Update on page load
+
+    const handleStorageChange = () => {
+        updateUserState();
+    };
+
+    const handleUserStateChanged = (event) => {
+        setUser(event.detail.user);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('userStateChanged', handleUserStateChanged);
+
+    return () => {
+        window.removeEventListener('storage', handleStorageChange);
+        window.removeEventListener('userStateChanged', handleUserStateChanged);
+    };
+}, []);
+```
+
+2. Admin Dashboard useCallback Düzeltmeleri:
+```javascript
+// AdminDashboard.js
+const loadDashboardData = useCallback(async () => {
+    try {
+        await Promise.all([
+            fetchTherapistData(),
+            fetchAppointments(),
+            fetchAvailabilitySlots(),
+            fetchStats()
+        ]);
+    } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        showSnackbar('Dashboard verileri yüklenirken hata oluştu', 'error');
+    }
+}, [fetchTherapistData, fetchAppointments, fetchAvailabilitySlots, fetchStats, showSnackbar]);
+
+useEffect(() => {
+    loadDashboardData();
+}, [loadDashboardData]);
+```
+
+3. Timezone Düzeltmeleri:
+```csharp
+// AvailabilityController.cs
+public async Task<ActionResult<AvailabilitySlot>> CreateSlot(AvailabilitySlot slot)
+{
+    // DateTime'ların Kind property'sini Unspecified olarak set et
+    slot.StartTime = DateTime.SpecifyKind(slot.StartTime, DateTimeKind.Unspecified);
+    slot.EndTime = DateTime.SpecifyKind(slot.EndTime, DateTimeKind.Unspecified);
+
+    // Türkiye saatini UTC'ye çevir
+    var turkeyTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Turkey Standard Time");
+    slot.StartTime = TimeZoneInfo.ConvertTimeToUtc(slot.StartTime, turkeyTimeZone);
+    slot.EndTime = TimeZoneInfo.ConvertTimeToUtc(slot.EndTime, turkeyTimeZone);
+
+    _context.AvailabilitySlots.Add(slot);
+    await _context.SaveChangesAsync();
+    return CreatedAtAction(nameof(GetSlot), new { id = slot.Id }, slot);
+}
+```
+
+4. Frontend Timezone Handling:
+```javascript
+// TherapistDashboard.js
+const formatTime = (timeString) => {
+    return dayjs.utc(timeString).tz('Europe/Istanbul').format('HH:mm');
+};
+```
+
+==========================================
+KARŞILAŞILAN SORUNLAR
+==========================================
+
+1. Login Persistence Sorunu:
+   - Sorun: Kullanıcı giriş yaptıktan sonra sayfa yenilenmeden login durumu kayboluyordu
+   - Çözüm: Custom event sistemi ve localStorage yönetimi iyileştirildi
+
+2. React Hook Dependency Warnings:
+   - Sorun: useEffect dependency array'lerinde eksik bağımlılıklar
+   - Çözüm: useCallback hook'ları eklendi ve dependency'ler düzeltildi
+
+3. Timezone Farkı:
+   - Sorun: Oluşturulan saatler 3 saat önce gösteriliyordu
+   - Çözüm: DateTimeKind ayarları ve timezone conversion düzeltildi
+
+4. Function Hoisting:
+   - Sorun: Function'lar tanımlanmadan önce kullanılıyordu
+   - Çözüm: useCallback ile function'lar stabilize edildi
+
+==========================================
+ÖĞRENİLEN KONULAR
+==========================================
+
+1. React State Management:
+   - Custom event sistemi
+   - localStorage yönetimi
+   - State synchronization
+
+2. React Hooks Best Practices:
+   - useCallback kullanımı
+   - useEffect dependency management
+   - Function hoisting önleme
+
+3. DateTime Handling:
+   - DateTimeKind property'si
+   - Timezone conversion
+   - UTC vs Local time
+
+4. Frontend-Backend Communication:
+   - Custom event dispatching
+   - State synchronization
+   - Error handling
+
+==========================================
+YARIN YAPILACAK İŞLER
+==========================================
+
+1. Ödeme sistemi entegrasyonu başlanacak
+2. Randevu oluşturma süreci iyileştirilecek
+3. Bildirim sistemi geliştirilecek
+4. Performans optimizasyonları yapılacak
+5. Test coverage artırılacak
+
+==========================================
+NOTLAR
+==========================================
+
+- Login sistemi tamamen stabil hale getirildi
+- Admin dashboard hatasız çalışıyor
+- Timezone sorunları çözüldü
+- React Hook best practices uygulandı
+- Kullanıcı deneyimi önemli ölçüde iyileştirildi
+
+==========================================
+İMZA
+==========================================
+
+Tarih: 11 Ağustos 2025
+İmza: _________________

@@ -1,11 +1,33 @@
 @startuml LOR_Masaj_Merkezi_DomainDiagram
 
 !theme plain
+skinparam backgroundColor white
 skinparam class {
-    BackgroundColor LightGreen
-    BorderColor DarkGreen
-    ArrowColor DarkGreen
+    BackgroundColor white
+    BorderColor #1976D2
+    ArrowColor #1976D2
+    FontColor #333333
+    FontSize 12
+    FontName Arial
+    BorderThickness 2
+    RoundCorner 10
+}
+
+skinparam enum {
+    BackgroundColor #E3F2FD
+    BorderColor #1976D2
+    FontColor #1976D2
     FontSize 11
+    FontName Arial
+    BorderThickness 1
+    RoundCorner 8
+}
+
+skinparam title {
+    FontColor #1976D2
+    FontSize 18
+    FontName Arial
+    FontStyle bold
 }
 
 title L'OR Masaj Merkezi Randevu Sistemi - Domain Diyagramı
