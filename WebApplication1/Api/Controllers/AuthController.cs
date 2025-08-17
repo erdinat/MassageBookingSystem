@@ -236,6 +236,39 @@ namespace WebApplication1.Api.Controllers
             }
         }
 
+        [HttpPost("verify-email")]
+        public async Task<ActionResult<AuthResponse>> VerifyEmail([FromBody] VerifyEmailRequest request)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(new AuthResponse 
+                    { 
+                        Success = false, 
+                        Message = "Geçersiz veri" 
+                    });
+                }
+
+                var result = await _authService.VerifyEmailAsync(request);
+                
+                if (result.Success)
+                {
+                    return Ok(result);
+                }
+                
+                return BadRequest(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error verifying email");
+                return StatusCode(500, new AuthResponse 
+                { 
+                    Success = false, 
+                    Message = "Sunucu hatası" 
+                });
+            }
+        }
 
     }
 }

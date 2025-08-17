@@ -1,0 +1,133 @@
+STAJ DEFTERİ - 16 TEMMUZ 2025
+
+==========================================
+GÜNLÜK ÇALIŞMA RAPORU
+==========================================
+
+TARİH: 16 Temmuz 2025
+ÇALIŞMA SAATİ: 09:00 - 17:00
+TOPLAM SAAT: 8 saat
+
+==========================================
+YAPILAN İŞLER
+==========================================
+
+1. İŞ ORTAMI TANITIMI:
+   - Şirket binası ve ofis ortamı tanıtıldı
+   - Çalışma saatleri ve kurallar açıklandı
+   - Güvenlik prosedürleri ve acil durum planları
+   - İletişim kanalları ve e-posta sistemleri
+
+2. TAKIM TANITIMI:
+   - Mentörüm Hüseyin Çobanoğlu ile tanışma
+   - Geliştirme ekibi üyeleriyle tanışma
+   - Proje yöneticisi ve diğer departmanlarla tanışma
+   - Organizasyon yapısı ve hiyerarşi
+
+3. TEKNOLOJİ ALTYAPISI:
+   - Geliştirme ortamı kurulumu
+   - Visual Studio Code ve gerekli eklentiler
+   - Git versiyon kontrol sistemi
+   - SQL Server Management Studio
+   - Node.js ve npm kurulumu
+
+4. PROJE GENEL BAKIŞ:
+   - Şirketin mevcut projeleri hakkında bilgi
+   - Kullanılan teknoloji stack'i
+   - Geliştirme metodolojileri
+   - Kod standartları ve best practices
+
+5. STAJ PROGRAMI:
+   - 25 iş günü staj planı açıklandı
+   - Haftalık hedefler ve beklentiler
+   - Değerlendirme kriterleri
+   - Raporlama ve dokümantasyon gereksinimleri
+
+==========================================
+TEKNİK DETAYLAR
+==========================================
+
+1. Geliştirme Ortamı:
+   - İşletim Sistemi: macOS
+   - IDE: Visual Studio Code
+   - Versiyon Kontrol: Git
+   - Veritabanı: SQL Server
+   - Backend: ASP.NET Core 8.0
+   - Frontend: React.js 18
+
+2. Proje Yönetimi Araçları:
+   - Git Repository: GitHub
+   - Issue Tracking: GitHub Issues
+   - Dokümantasyon: Markdown
+   - API Testing: Postman
+
+3. İletişim Araçları:
+   - E-posta: Kurumsal e-posta hesabı
+   - Mesajlaşma: Slack/Teams
+   - Video Konferans: Zoom/Teams
+   - Proje Takibi: Jira/Trello
+
+==========================================
+KARŞILAŞILAN SORUNLAR
+==========================================
+
+1. İlk Gün Adaptasyonu:
+   - Sorun: Yeni ortama alışma süreci
+   - Çözüm: Mentörümün rehberliği ve sabırlı yaklaşımı
+
+2. Teknoloji Stack Karmaşıklığı:
+   - Sorun: Çok sayıda teknoloji öğrenme ihtiyacı
+   - Çözüm: Kademeli öğrenme planı hazırlandı
+
+3. Geliştirme Ortamı Kurulumu:
+   - Sorun: macOS'ta .NET development environment
+   - Çözüm: Homebrew ve .NET SDK kurulumu tamamlandı
+
+==========================================
+ÖĞRENİLEN KONULAR
+==========================================
+
+1. Şirket Kültürü:
+   - Agile development methodology
+   - Code review süreçleri
+   - Pair programming yaklaşımı
+   - Continuous integration/deployment
+
+2. Teknoloji Stack:
+   - Full-stack development kavramı
+   - Microservices architecture
+   - RESTful API design
+   - Modern web development trends
+
+3. Proje Yönetimi:
+   - Git workflow (feature branches)
+   - Issue tracking ve bug reporting
+   - Code documentation standards
+   - Testing strategies
+
+==========================================
+YARIN YAPILACAK İŞLER
+==========================================
+
+1. C# programlama dili temel eğitimi
+2. SQL Server veritabanı yönetimi
+3. React.js frontend framework tanıtımı
+4. Basit "Hello World" projeleri
+5. Git komutları ve workflow pratiği
+
+==========================================
+NOTLAR
+==========================================
+
+- İlk gün oldukça yoğun ve bilgilendirici geçti
+- Mentörüm Hüseyin Çobanoğlu çok yardımcı ve sabırlı
+- Teknoloji stack'inin büyüklüğü başta göz korkutucu
+- Pratik yapmanın önemini vurguladılar
+- Hafta sonları çalışma olmayacak, dinlenme zamanı
+
+==========================================
+İMZA
+==========================================
+
+Tarih: 16 Temmuz 2025
+İmza: _________________

@@ -1,0 +1,228 @@
+STAJ DEFTERİ - 21 TEMMUZ 2025
+
+==========================================
+GÜNLÜK ÇALIŞMA RAPORU
+==========================================
+
+TARİH: 21 Temmuz 2025
+ÇALIŞMA SAATİ: 09:00 - 17:00
+TOPLAM SAAT: 8 saat
+
+==========================================
+YAPILAN İŞLER
+==========================================
+
+1. PROJE GEREKSİNİM ANALİZİ:
+   - L'OR Masaj Merkezi randevu sistemi projesi tanıtımı
+   - Kullanıcı hikayeleri (User Stories) analizi
+   - Fonksiyonel gereksinimler belirlendi
+   - Non-fonksiyonel gereksinimler (performans, güvenlik)
+   - Proje kapsamı ve sınırları belirlendi
+
+2. SİSTEM MİMARİSİ TASARIMI:
+   - Layered architecture pattern seçimi
+   - Backend: ASP.NET Core Web API
+   - Frontend: React.js + Material-UI
+   - Veritabanı: SQL Server + Entity Framework
+   - RESTful API design principles
+
+3. VERİTABANI TASARIMI:
+   - Entity Relationship (ER) diyagramı oluşturuldu
+   - Ana tablolar: Users, Customers, Therapists, Services, Appointments, AvailabilitySlots
+   - İlişkiler ve foreign key'ler belirlendi
+   - Normalization kuralları uygulandı
+   - Index stratejileri planlandı
+
+4. API ENDPOINT TASARIMI:
+   - RESTful API endpoint'leri planlandı
+   - CRUD operasyonları için endpoint'ler
+   - Authentication ve authorization planı
+   - Error handling ve response formatları
+   - API documentation planı
+
+5. FRONTEND COMPONENT YAPISI:
+   - React component hierarchy tasarlandı
+   - Sayfa yapısı ve routing planı
+   - State management stratejisi
+   - UI/UX wireframe'leri oluşturuldu
+   - Responsive design planı
+
+==========================================
+TEKNİK DETAYLAR
+==========================================
+
+1. Proje Gereksinimleri:
+   - Müşteri randevu alma sistemi
+   - Terapist müsaitlik yönetimi
+   - Admin paneli ve raporlama
+   - Kullanıcı authentication
+   - Bildirim sistemi
+
+2. Veritabanı Şeması:
+```sql
+-- Users tablosu (authentication için)
+CREATE TABLE Users (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(100) NOT NULL,
+    Email NVARCHAR(255) UNIQUE NOT NULL,
+    PasswordHash NVARCHAR(MAX) NOT NULL,
+    Role NVARCHAR(20) NOT NULL, -- Admin, Customer, Therapist
+    CreatedAt DATETIME2 DEFAULT GETUTCDATE()
+);
+
+-- Customers tablosu
+CREATE TABLE Customers (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(100) NOT NULL,
+    Surname NVARCHAR(100) NOT NULL,
+    Phone NVARCHAR(20),
+    Email NVARCHAR(255) UNIQUE NOT NULL
+);
+
+-- Therapists tablosu
+CREATE TABLE Therapists (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(100) NOT NULL,
+    Bio NVARCHAR(MAX),
+    ProfilePictureUrl NVARCHAR(500),
+    UserId INT FOREIGN KEY REFERENCES Users(Id)
+);
+
+-- Services tablosu
+CREATE TABLE Services (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(100) NOT NULL,
+    Description NVARCHAR(MAX),
+    Price DECIMAL(10,2) NOT NULL,
+    DurationMinutes INT NOT NULL
+);
+
+-- AvailabilitySlots tablosu
+CREATE TABLE AvailabilitySlots (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    TherapistId INT FOREIGN KEY REFERENCES Therapists(Id),
+    StartTime DATETIME2 NOT NULL,
+    EndTime DATETIME2 NOT NULL,
+    IsBooked BIT DEFAULT 0
+);
+
+-- Appointments tablosu
+CREATE TABLE Appointments (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    CustomerId INT FOREIGN KEY REFERENCES Customers(Id),
+    TherapistId INT FOREIGN KEY REFERENCES Therapists(Id),
+    ServiceId INT FOREIGN KEY REFERENCES Services(Id),
+    AvailabilitySlotId INT FOREIGN KEY REFERENCES AvailabilitySlots(Id),
+    UserId INT FOREIGN KEY REFERENCES Users(Id),
+    CreatedAt DATETIME2 DEFAULT GETUTCDATE()
+);
+```
+
+3. API Endpoint Planı:
+```
+GET    /api/users              - Kullanıcı listesi
+POST   /api/auth/login         - Giriş
+POST   /api/auth/register      - Kayıt
+GET    /api/services           - Hizmet listesi
+GET    /api/therapists         - Terapist listesi
+GET    /api/availability       - Müsaitlik listesi
+POST   /api/appointments       - Randevu oluşturma
+GET    /api/appointments       - Randevu listesi
+PUT    /api/appointments/{id}  - Randevu güncelleme
+DELETE /api/appointments/{id}  - Randevu iptal
+```
+
+4. Frontend Component Yapısı:
+```
+App.js
+├── HomePage.js
+├── LoginRegisterPage.js
+├── ServicesPage.js
+├── TherapistsPage.js
+├── BookingPage.js
+├── AppointmentManagementPage.js
+├── AdminDashboard.js
+├── TherapistDashboard.js
+└── ProfilePage.js
+
+Components/
+├── ServiceCard.js
+├── TherapistCard.js
+├── Button.js
+└── ServiceList.js
+```
+
+==========================================
+KARŞILAŞILAN SORUNLAR
+==========================================
+
+1. Proje Kapsamı Belirleme:
+   - Sorun: Hangi özelliklerin dahil edileceğine karar verme
+   - Çözüm: MVP (Minimum Viable Product) yaklaşımı benimsendi
+
+2. Veritabanı İlişkileri:
+   - Sorun: Karmaşık ilişkileri modelleme
+   - Çözüm: ER diyagramı çizerek ilişkileri görselleştirme
+
+3. API Tasarımı:
+   - Sorun: RESTful API best practices'i uygulama
+   - Çözüm: REST conventions'ları araştırma ve uygulama
+
+4. Frontend Architecture:
+   - Sorun: Component yapısını optimize etme
+   - Çözüm: Single Responsibility Principle uygulama
+
+==========================================
+ÖĞRENİLEN KONULAR
+==========================================
+
+1. Proje Yönetimi:
+   - Requirements gathering
+   - System architecture design
+   - Database design principles
+   - API design patterns
+
+2. Software Architecture:
+   - Layered architecture
+   - Separation of concerns
+   - Dependency injection
+   - Repository pattern
+
+3. Database Design:
+   - Entity Relationship modeling
+   - Normalization
+   - Foreign key relationships
+   - Index optimization
+
+4. API Design:
+   - RESTful principles
+   - HTTP methods and status codes
+   - Request/response patterns
+   - Error handling
+
+==========================================
+YARIN YAPILACAK İŞLER
+==========================================
+
+1. Development environment kurulumu
+2. Backend proje yapısını oluşturma
+3. Entity Framework modellerini oluşturma
+4. İlk migration'ı oluşturma
+5. Temel API controller'larını yazma
+
+==========================================
+NOTLAR
+==========================================
+
+- Proje kapsamı başta göz korkutucu geldi ama adım adım planlama yardımcı oldu
+- Veritabanı tasarımı çok önemli, iyi planlama gerekli
+- API tasarımında RESTful principles önemli
+- Frontend component yapısı mantıklı olmalı
+- Mentörüm Hüseyin Çobanoğlu çok yardımcı oldu
+
+==========================================
+İMZA
+==========================================
+
+Tarih: 21 Temmuz 2025
+İmza: _________________

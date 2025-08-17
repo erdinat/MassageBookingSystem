@@ -40,6 +40,8 @@ import AdminDashboard from './pages/AdminDashboard';
 import TherapistDashboard from './pages/TherapistDashboard';
 import LoginRegisterPage from './pages/LoginRegisterPage';
 import ProfilePage from './pages/ProfilePage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
+import VerifyEmailPage from './pages/VerifyEmailPage';
 
 // Arka planı yönetecek özel bileşen
 const Background = () => (
@@ -515,6 +517,16 @@ function App() {
             <Route path="/therapist-dashboard" element={
               <motion.div style={{ backgroundColor: 'transparent' }} initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
                 <TherapistDashboard />
+              </motion.div>
+            } />
+            <Route path="/reset-password" element={
+              <motion.div style={{ backgroundColor: 'transparent' }} initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
+                <ResetPasswordPage />
+              </motion.div>
+            } />
+            <Route path="/verify-email" element={
+              <motion.div style={{ backgroundColor: 'transparent' }} initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
+                <VerifyEmailPage />
               </motion.div>
             } />
           </Routes>

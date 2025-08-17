@@ -1,0 +1,314 @@
+STAJ DEFTERİ - 22 TEMMUZ 2025
+
+==========================================
+GÜNLÜK ÇALIŞMA RAPORU
+==========================================
+
+TARİH: 22 Temmuz 2025
+ÇALIŞMA SAATİ: 09:00 - 17:00
+TOPLAM SAAT: 8 saat
+
+==========================================
+YAPILAN İŞLER
+==========================================
+
+1. BACKEND PROJE YAPISI OLUŞTURMA:
+   - ASP.NET Core Web API projesi oluşturuldu
+   - Proje klasör yapısı düzenlendi
+   - NuGet paketleri yüklendi
+   - Configuration dosyaları hazırlandı
+   - Development environment kurulumu tamamlandı
+
+2. ENTITY FRAMEWORK MODELLERİ:
+   - User modeli oluşturuldu
+   - Customer modeli oluşturuldu
+   - Therapist modeli oluşturuldu
+   - Service modeli oluşturuldu
+   - AvailabilitySlot modeli oluşturuldu
+   - Appointment modeli oluşturuldu
+
+3. APPLICATIONDBCONTEXT SINIFI:
+   - DbContext sınıfı oluşturuldu
+   - DbSet'ler tanımlandı
+   - Entity konfigürasyonları yapıldı
+   - İlişki tanımlamaları (relationships) eklendi
+   - Index'ler ve constraint'ler tanımlandı
+
+4. İLK MIGRATION OLUŞTURMA:
+   - Entity Framework migration komutları öğrenildi
+   - İlk migration oluşturuldu
+   - Veritabanı oluşturuldu
+   - Tablo yapıları kontrol edildi
+   - Seed data planı hazırlandı
+
+5. TEMEL API CONTROLLER'LARI:
+   - ServicesController oluşturuldu
+   - TherapistsController oluşturuldu
+   - CustomersController oluşturuldu
+   - Temel CRUD operasyonları yazıldı
+   - API endpoint'leri test edildi
+
+==========================================
+TEKNİK DETAYLAR
+==========================================
+
+1. Proje Yapısı:
+```
+WebApplication1/
+├── Api/
+│   ├── Controllers/
+│   ├── Models/
+│   ├── Data/
+│   ├── Services/
+│   └── DTOs/
+├── Migrations/
+├── appsettings.json
+└── Program.cs
+```
+
+2. Entity Models:
+```csharp
+public class User
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Email { get; set; }
+    public string PasswordHash { get; set; }
+    public UserRole Role { get; set; }
+    public DateTime CreatedAt { get; set; }
+    
+    // Navigation properties
+    public virtual Therapist Therapist { get; set; }
+    public virtual ICollection<Appointment> Appointments { get; set; }
+}
+
+public class Customer
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Surname { get; set; }
+    public string Phone { get; set; }
+    public string Email { get; set; }
+    
+    // Navigation properties
+    public virtual ICollection<Appointment> Appointments { get; set; }
+}
+
+public class Therapist
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Bio { get; set; }
+    public string ProfilePictureUrl { get; set; }
+    public int UserId { get; set; }
+    
+    // Navigation properties
+    public virtual User User { get; set; }
+    public virtual ICollection<Appointment> Appointments { get; set; }
+    public virtual ICollection<AvailabilitySlot> AvailabilitySlots { get; set; }
+}
+
+public class Service
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public decimal Price { get; set; }
+    public int DurationMinutes { get; set; }
+    
+    // Navigation properties
+    public virtual ICollection<Appointment> Appointments { get; set; }
+}
+
+public class AvailabilitySlot
+{
+    public int Id { get; set; }
+    public int TherapistId { get; set; }
+    public DateTime StartTime { get; set; }
+    public DateTime EndTime { get; set; }
+    public bool IsBooked { get; set; }
+    
+    // Navigation properties
+    public virtual Therapist Therapist { get; set; }
+    public virtual Appointment Appointment { get; set; }
+}
+
+public class Appointment
+{
+    public int Id { get; set; }
+    public int CustomerId { get; set; }
+    public int TherapistId { get; set; }
+    public int ServiceId { get; set; }
+    public int AvailabilitySlotId { get; set; }
+    public int UserId { get; set; }
+    public DateTime CreatedAt { get; set; }
+    
+    // Navigation properties
+    public virtual Customer Customer { get; set; }
+    public virtual Therapist Therapist { get; set; }
+    public virtual Service Service { get; set; }
+    public virtual AvailabilitySlot AvailabilitySlot { get; set; }
+    public virtual User User { get; set; }
+}
+```
+
+3. ApplicationDbContext:
+```csharp
+public class ApplicationDbContext : DbContext
+{
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : base(options)
+    {
+    }
+    
+    public DbSet<User> Users { get; set; }
+    public DbSet<Customer> Customers { get; set; }
+    public DbSet<Therapist> Therapists { get; set; }
+    public DbSet<Service> Services { get; set; }
+    public DbSet<AvailabilitySlot> AvailabilitySlots { get; set; }
+    public DbSet<Appointment> Appointments { get; set; }
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        // User configuration
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Email)
+            .IsUnique();
+            
+        // Customer configuration
+        modelBuilder.Entity<Customer>()
+            .HasIndex(c => c.Email)
+            .IsUnique();
+            
+        // Therapist configuration
+        modelBuilder.Entity<Therapist>()
+            .HasOne(t => t.User)
+            .WithOne(u => u.Therapist)
+            .HasForeignKey<Therapist>(t => t.UserId);
+            
+        // Appointment configuration
+        modelBuilder.Entity<Appointment>()
+            .HasOne(a => a.AvailabilitySlot)
+            .WithOne(av => av.Appointment)
+            .HasForeignKey<Appointment>(a => a.AvailabilitySlotId);
+    }
+}
+```
+
+4. API Controller Örneği:
+```csharp
+[ApiController]
+[Route("api/[controller]")]
+public class ServicesController : ControllerBase
+{
+    private readonly ApplicationDbContext _context;
+    
+    public ServicesController(ApplicationDbContext context)
+    {
+        _context = context;
+    }
+    
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<Service>>> GetServices()
+    {
+        return await _context.Services.ToListAsync();
+    }
+    
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Service>> GetService(int id)
+    {
+        var service = await _context.Services.FindAsync(id);
+        
+        if (service == null)
+        {
+            return NotFound();
+        }
+        
+        return service;
+    }
+    
+    [HttpPost]
+    public async Task<ActionResult<Service>> CreateService(Service service)
+    {
+        _context.Services.Add(service);
+        await _context.SaveChangesAsync();
+        
+        return CreatedAtAction(nameof(GetService), new { id = service.Id }, service);
+    }
+}
+```
+
+==========================================
+KARŞILAŞILAN SORUNLAR
+==========================================
+
+1. Entity Framework Migration:
+   - Sorun: Migration komutlarını öğrenme
+   - Çözüm: dotnet ef commands araştırma ve pratik yapma
+
+2. Entity Relationships:
+   - Sorun: Karmaşık ilişkileri doğru modelleme
+   - Çözüm: Navigation properties ve foreign key'leri dikkatli tanımlama
+
+3. DbContext Configuration:
+   - Sorun: OnModelCreating metodunda konfigürasyon
+   - Çözüm: Entity Framework Fluent API dokümantasyonu inceleme
+
+4. API Controller Patterns:
+   - Sorun: RESTful API best practices uygulama
+   - Çözüm: Microsoft ASP.NET Core dokümantasyonu takip etme
+
+==========================================
+ÖĞRENİLEN KONULAR
+==========================================
+
+1. Entity Framework Core:
+   - Code-First approach
+   - Migration management
+   - Entity relationships
+   - Fluent API configuration
+
+2. ASP.NET Core Web API:
+   - Controller patterns
+   - Dependency injection
+   - Async/await usage
+   - HTTP status codes
+
+3. Database Design:
+   - Foreign key relationships
+   - Index optimization
+   - Constraint definitions
+   - Data integrity
+
+4. Project Structure:
+   - Layered architecture
+   - Separation of concerns
+   - Clean code principles
+   - Best practices
+
+==========================================
+YARIN YAPILACAK İŞLER
+==========================================
+
+1. Authentication ve authorization sistemi
+2. JWT token implementation
+3. User registration ve login endpoints
+4. Password hashing ve security
+5. Frontend proje yapısını oluşturma
+
+==========================================
+NOTLAR
+==========================================
+
+- Entity Framework öğrenmek çok faydalı oldu
+- Migration sistemi çok pratik
+- API controller'ları yazmak keyifli
+- Veritabanı ilişkileri doğru kurulmalı
+- Mentörüm Hüseyin Çobanoğlu çok detaylı açıkladı
+
+==========================================
+İMZA
+==========================================
+
+Tarih: 22 Temmuz 2025
+İmza: _________________

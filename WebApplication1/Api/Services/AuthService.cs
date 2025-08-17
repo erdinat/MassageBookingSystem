@@ -16,6 +16,7 @@ namespace WebApplication1.Api.Services
         Task<AuthResponse> UpdateProfileAsync(int userId, UpdateProfileRequest request);
         Task<AuthResponse> ForgotPasswordAsync(ForgotPasswordRequest request);
         Task<AuthResponse> ResetPasswordAsync(ResetPasswordRequest request);
+        Task<AuthResponse> VerifyEmailAsync(VerifyEmailRequest request);
         Task<UserDto?> GetUserProfileAsync(int userId);
     }
 
@@ -243,6 +244,44 @@ namespace WebApplication1.Api.Services
             {
                 _logger.LogError(ex, "Şifre sıfırlama sırasında hata oluştu");
                 return new AuthResponse { Success = false, Message = "Şifre sıfırlama sırasında bir hata oluştu." };
+            }
+        }
+
+        public async Task<AuthResponse> VerifyEmailAsync(VerifyEmailRequest request)
+        {
+            try
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+                if (user == null)
+                {
+                    return new AuthResponse { Success = false, Message = "Bu email adresi ile kayıtlı kullanıcı bulunamadı." };
+                }
+
+                if (user.EmailVerificationToken != request.Token)
+                {
+                    return new AuthResponse { Success = false, Message = "Geçersiz token." };
+                }
+
+                if (user.EmailVerificationTokenExpiry < DateTime.UtcNow)
+                {
+                    return new AuthResponse { Success = false, Message = "Token süresi dolmuş." };
+                }
+
+                user.IsEmailVerified = true;
+                user.EmailVerificationToken = null;
+                user.EmailVerificationTokenExpiry = null;
+                await _context.SaveChangesAsync();
+
+                return new AuthResponse
+                {
+                    Success = true,
+                    Message = "Email adresiniz başarıyla doğrulandı."
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Email doğrulama sırasında hata oluştu");
+                return new AuthResponse { Success = false, Message = "Email doğrulama sırasında bir hata oluştu." };
             }
         }
 

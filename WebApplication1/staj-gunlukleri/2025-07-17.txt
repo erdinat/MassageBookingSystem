@@ -1,0 +1,221 @@
+STAJ DEFTERİ - 17 TEMMUZ 2025
+
+==========================================
+GÜNLÜK ÇALIŞMA RAPORU
+==========================================
+
+TARİH: 17 Temmuz 2025
+ÇALIŞMA SAATİ: 09:00 - 17:00
+TOPLAM SAAT: 8 saat
+
+==========================================
+YAPILAN İŞLER
+==========================================
+
+1. C# PROGRAMLAMA DİLİ EĞİTİMİ:
+   - C# syntax ve temel kavramlar
+   - Object-oriented programming (OOP) prensipleri
+   - Classes, objects, inheritance, polymorphism
+   - Exception handling ve error management
+   - Collections ve LINQ kullanımı
+
+2. .NET FRAMEWORK VE ASP.NET CORE:
+   - .NET 8.0 framework tanıtımı
+   - ASP.NET Core Web API yapısı
+   - Controller ve Model kavramları
+   - Dependency Injection (DI) pattern
+   - Middleware ve request pipeline
+
+3. SQL SERVER VERİTABANI EĞİTİMİ:
+   - SQL Server Management Studio kullanımı
+   - Temel SQL komutları (SELECT, INSERT, UPDATE, DELETE)
+   - Veritabanı tasarım prensipleri
+   - Normalization ve indexing
+   - Stored procedures ve views
+
+4. ENTITY FRAMEWORK CORE:
+   - ORM (Object-Relational Mapping) kavramı
+   - Code-First yaklaşımı
+   - Migration ve database management
+   - CRUD operasyonları
+   - Relationship mapping
+
+5. PRATİK UYGULAMALAR:
+   - Basit C# console uygulamaları
+   - SQL Server'da veritabanı oluşturma
+   - Entity Framework ile model oluşturma
+   - İlk Web API projesi
+
+==========================================
+TEKNİK DETAYLAR
+==========================================
+
+1. C# Temel Syntax:
+```csharp
+// Class tanımlama
+public class User
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Email { get; set; }
+    
+    public User(string name, string email)
+    {
+        Name = name;
+        Email = email;
+    }
+}
+
+// Exception handling
+try
+{
+    var result = Divide(a, b);
+}
+catch (DivideByZeroException ex)
+{
+    Console.WriteLine($"Error: {ex.Message}");
+}
+```
+
+2. ASP.NET Core Controller:
+```csharp
+[ApiController]
+[Route("api/[controller]")]
+public class UsersController : ControllerBase
+{
+    private readonly IUserService _userService;
+    
+    public UsersController(IUserService userService)
+    {
+        _userService = userService;
+    }
+    
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+    {
+        var users = await _userService.GetAllUsersAsync();
+        return Ok(users);
+    }
+}
+```
+
+3. Entity Framework Model:
+```csharp
+public class User
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Email { get; set; }
+    public DateTime CreatedAt { get; set; }
+    
+    // Navigation properties
+    public virtual ICollection<Appointment> Appointments { get; set; }
+}
+
+public class ApplicationDbContext : DbContext
+{
+    public DbSet<User> Users { get; set; }
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Email)
+            .IsUnique();
+    }
+}
+```
+
+4. SQL Server Temel Komutlar:
+```sql
+-- Veritabanı oluşturma
+CREATE DATABASE MassageBookingSystem;
+
+-- Tablo oluşturma
+CREATE TABLE Users (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(100) NOT NULL,
+    Email NVARCHAR(255) UNIQUE NOT NULL,
+    CreatedAt DATETIME2 DEFAULT GETUTCDATE()
+);
+
+-- Veri ekleme
+INSERT INTO Users (Name, Email) VALUES ('John Doe', 'john@example.com');
+
+-- Veri sorgulama
+SELECT * FROM Users WHERE Email = 'john@example.com';
+```
+
+==========================================
+KARŞILAŞILAN SORUNLAR
+==========================================
+
+1. C# Syntax Öğrenme:
+   - Sorun: Yeni programlama dili syntax'ına alışma
+   - Çözüm: Bol bol pratik yapma ve örnek kodlar inceleme
+
+2. Entity Framework Kavramı:
+   - Sorun: ORM kavramını ve Code-First yaklaşımını anlama
+   - Çözüm: Veritabanı ilişkilerini önce kağıt üzerinde çizme
+
+3. SQL Server Kurulumu:
+   - Sorun: macOS'ta SQL Server kurulumu
+   - Çözüm: Docker container kullanarak SQL Server çalıştırma
+
+4. .NET SDK Kurulumu:
+   - Sorun: macOS'ta .NET development environment
+   - Çözüm: Homebrew ile .NET SDK kurulumu
+
+==========================================
+ÖĞRENİLEN KONULAR
+==========================================
+
+1. C# Programming:
+   - Object-oriented programming
+   - Exception handling
+   - LINQ queries
+   - Async/await pattern
+
+2. ASP.NET Core:
+   - Web API development
+   - Dependency injection
+   - Middleware pipeline
+   - Controller patterns
+
+3. Entity Framework:
+   - ORM concepts
+   - Code-First approach
+   - Migration management
+   - Relationship mapping
+
+4. SQL Server:
+   - Database design principles
+   - SQL query optimization
+   - Indexing strategies
+   - Stored procedures
+
+==========================================
+YARIN YAPILACAK İŞLER
+==========================================
+
+1. React.js frontend framework eğitimi
+2. JavaScript ES6+ syntax öğrenme
+3. Component-based architecture
+4. State management kavramları
+5. Frontend-backend iletişimi
+
+==========================================
+NOTLAR
+==========================================
+
+- C# öğrenmek başta zor geldi ama pratik yapınca kolaylaştı
+- Entity Framework kavramı çok faydalı
+- SQL Server'da veritabanı tasarımı önemli
+- Mentörüm Hüseyin Çobanoğlu çok detaylı açıkladı
+- Yarın React.js'e geçeceğiz
+
+==========================================
+İMZA
+==========================================
+
+Tarih: 17 Temmuz 2025
+İmza: _________________

@@ -1,0 +1,254 @@
+STAJ DEFTERİ - 18 TEMMUZ 2025
+
+==========================================
+GÜNLÜK ÇALIŞMA RAPORU
+==========================================
+
+TARİH: 18 Temmuz 2025
+ÇALIŞMA SAATİ: 09:00 - 17:00
+TOPLAM SAAT: 8 saat
+
+==========================================
+YAPILAN İŞLER
+==========================================
+
+1. JAVASCRIPT ES6+ EĞİTİMİ:
+   - Modern JavaScript syntax
+   - Arrow functions ve template literals
+   - Destructuring ve spread operator
+   - Promises ve async/await
+   - Modules ve import/export
+
+2. REACT.JS FRONTEND FRAMEWORK:
+   - React.js 18 tanıtımı ve kurulumu
+   - Component-based architecture
+   - JSX syntax ve rendering
+   - State ve props kavramları
+   - Virtual DOM ve reconciliation
+
+3. REACT HOOKS:
+   - useState hook kullanımı
+   - useEffect hook ve lifecycle
+   - useCallback ve useMemo optimizasyonu
+   - Custom hooks oluşturma
+   - Hook kuralları ve best practices
+
+4. MATERIAL-UI (MUI) KÜTÜPHANESİ:
+   - MUI component library tanıtımı
+   - Theme ve styling sistemi
+   - Responsive design
+   - Form components ve validation
+   - Navigation ve layout components
+
+5. FRONTEND-BACKEND İLETİŞİMİ:
+   - Fetch API kullanımı
+   - RESTful API consumption
+   - Error handling ve loading states
+   - CORS (Cross-Origin Resource Sharing)
+   - JSON data format
+
+==========================================
+TEKNİK DETAYLAR
+==========================================
+
+1. JavaScript ES6+ Syntax:
+```javascript
+// Arrow functions
+const add = (a, b) => a + b;
+
+// Destructuring
+const { name, email } = user;
+
+// Template literals
+const message = `Hello ${name}, your email is ${email}`;
+
+// Async/await
+const fetchUser = async (id) => {
+    try {
+        const response = await fetch(`/api/users/${id}`);
+        const user = await response.json();
+        return user;
+    } catch (error) {
+        console.error('Error fetching user:', error);
+    }
+};
+```
+
+2. React Component:
+```javascript
+import React, { useState, useEffect } from 'react';
+
+function UserList() {
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    
+    useEffect(() => {
+        fetchUsers();
+    }, []);
+    
+    const fetchUsers = async () => {
+        try {
+            const response = await fetch('/api/users');
+            const data = await response.json();
+            setUsers(data);
+        } catch (error) {
+            console.error('Error fetching users:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+    
+    return (
+        <div>
+            {loading ? <p>Loading...</p> : (
+                <ul>
+                    {users.map(user => (
+                        <li key={user.id}>{user.name}</li>
+                    ))}
+                </ul>
+            )}
+        </div>
+    );
+}
+```
+
+3. Material-UI Component:
+```javascript
+import React from 'react';
+import { 
+    Card, 
+    CardContent, 
+    Typography, 
+    Button, 
+    TextField,
+    Box 
+} from '@mui/material';
+
+function UserCard({ user, onEdit }) {
+    return (
+        <Card sx={{ maxWidth: 345, m: 2 }}>
+            <CardContent>
+                <Typography variant="h5" component="div">
+                    {user.name}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                    {user.email}
+                </Typography>
+                <Box sx={{ mt: 2 }}>
+                    <Button 
+                        variant="contained" 
+                        onClick={() => onEdit(user)}
+                    >
+                        Edit
+                    </Button>
+                </Box>
+            </CardContent>
+        </Card>
+    );
+}
+```
+
+4. Custom Hook:
+```javascript
+import { useState, useEffect } from 'react';
+
+function useApiData(url) {
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                const response = await fetch(url);
+                const result = await response.json();
+                setData(result);
+            } catch (err) {
+                setError(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        
+        fetchData();
+    }, [url]);
+    
+    return { data, loading, error };
+}
+```
+
+==========================================
+KARŞILAŞILAN SORUNLAR
+==========================================
+
+1. React Hooks Kavramı:
+   - Sorun: useState ve useEffect kullanımını anlama
+   - Çözüm: Basit örneklerle başlayıp kademeli olarak karmaşıklaştırma
+
+2. JavaScript Asenkron Programlama:
+   - Sorun: Promise ve async/await kavramını anlama
+   - Çözüm: Callback'lerden başlayıp Promise'lere geçiş
+
+3. Material-UI Styling:
+   - Sorun: MUI component'lerinin styling sistemini anlama
+   - Çözüm: sx prop ve theme sistemini pratik yapma
+
+4. Frontend-Backend İletişimi:
+   - Sorun: CORS hataları ve API communication
+   - Çözüm: Backend'de CORS configuration ve frontend'de error handling
+
+==========================================
+ÖĞRENİLEN KONULAR
+==========================================
+
+1. JavaScript ES6+:
+   - Modern JavaScript features
+   - Asynchronous programming
+   - Module system
+   - Error handling
+
+2. React.js:
+   - Component-based architecture
+   - State management
+   - Hooks usage
+   - JSX syntax
+
+3. Material-UI:
+   - Component library usage
+   - Theming system
+   - Responsive design
+   - Form handling
+
+4. Frontend Development:
+   - API consumption
+   - Error handling
+   - Loading states
+   - User experience
+
+==========================================
+YARIN YAPILACAK İŞLER
+==========================================
+
+1. Proje gereksinimlerini analiz etme
+2. Veritabanı şemasını tasarlama
+3. API endpoint'lerini planlama
+4. Frontend component yapısını oluşturma
+5. Development environment kurulumu
+
+==========================================
+NOTLAR
+==========================================
+
+- React.js öğrenmek çok keyifli ve mantıklı
+- Hooks kavramı başta karmaşık geldi ama pratik yapınca anlaşıldı
+- Material-UI component'leri çok kullanışlı
+- Frontend-backend iletişimi önemli bir konu
+- Yarın gerçek projeye başlayacağız
+
+==========================================
+İMZA
+==========================================
+
+Tarih: 18 Temmuz 2025
+İmza: _________________

@@ -1,0 +1,177 @@
+STAJ DEFTERİ - 15 AĞUSTOS 2025
+
+==========================================
+GÜNLÜK ÇALIŞMA RAPORU
+==========================================
+
+TARİH: 15 Ağustos 2025
+ÇALIŞMA SAATİ: 09:00 - 17:00
+TOPLAM SAAT: 8 saat
+
+==========================================
+YAPILAN İŞLER
+==========================================
+
+1. MSSQL SUNUM HAZIRLIĞI:
+   - Gamma AI presentation prompts hazırlandı
+   - Database documentation tamamlandı
+   - SQL query examples hazırlandı
+   - Stored procedure düzeltmeleri
+   - View definition düzeltmeleri
+
+2. DATABASE DOKÜMANTASYONU:
+   - Table structures documented
+   - Relationship mappings
+   - Query optimization examples
+   - Performance best practices
+   - Data consistency rules
+
+3. STORED PROCEDURE DÜZELTMELERİ:
+   - GetTherapistReport procedure düzeltildi
+   - StartTime field issue çözüldü
+   - AvailabilitySlots table join eklendi
+   - Parameter validation
+   - Error handling
+
+4. VIEW DEFINITION DÜZELTMELERİ:
+   - AppointmentSummary view düzeltildi
+   - Incorrect table joins düzeltildi
+   - Proper join structure
+   - Performance optimization
+   - Data consistency
+
+5. PRESENTATION MATERIALS:
+   - SQL query examples
+   - Database schema diagrams
+   - Performance optimization tips
+   - Best practices documentation
+   - Technical presentation content
+
+==========================================
+TEKNİK DETAYLAR
+==========================================
+
+1. Stored Procedure:
+```sql
+CREATE PROCEDURE GetTherapistReport
+    @TherapistId INT = NULL,
+    @StartDate DATETIME = NULL
+AS
+BEGIN
+    SELECT t.Name AS TherapistName,
+           c.Name + ' ' + c.Surname AS Customer,
+           s.Name AS Service,
+           av.StartTime,
+           av.EndTime,
+           a.CreatedAt AS AppointmentCreated
+    FROM Appointments a
+    JOIN Therapists t ON a.TherapistId = t.Id
+    JOIN Customers c ON a.CustomerId = c.Id
+    JOIN Services s ON a.ServiceId = s.Id
+    JOIN AvailabilitySlots av ON a.AvailabilitySlotId = av.Id
+    WHERE (@TherapistId IS NULL OR t.Id = @TherapistId)
+      AND (@StartDate IS NULL OR av.StartTime >= @StartDate)
+    ORDER BY av.StartTime DESC;
+END;
+```
+
+2. View Definition:
+```sql
+CREATE VIEW AppointmentSummary AS 
+SELECT 
+    a.Id,
+    c.Name + ' ' + c.Surname AS Customer,
+    t.Name AS Therapist,
+    s.Name AS Service,
+    av.StartTime,
+    av.EndTime,
+    CASE 
+        WHEN av.StartTime > GETUTCDATE() THEN 'Gelecek'
+        ELSE 'Geçmiş'
+    END AS Status
+FROM Appointments a
+JOIN Customers c ON a.CustomerId = c.Id
+JOIN Therapists t ON a.TherapistId = t.Id
+JOIN Services s ON a.ServiceId = s.Id
+JOIN AvailabilitySlots av ON a.AvailabilitySlotId = av.Id;
+```
+
+==========================================
+KARŞILAŞILAN SORUNLAR
+==========================================
+
+1. Stored Procedure Error:
+   - Sorun: StartTime field bulunamıyordu
+   - Çözüm: AvailabilitySlots table join eklendi
+
+2. View Definition:
+   - Sorun: Incorrect table joins
+   - Çözüm: Proper join structure
+
+3. SQL Query Optimization:
+   - Sorun: Performance issues
+   - Çözüm: Index optimization
+
+==========================================
+ÖĞRENİLEN KONULAR
+==========================================
+
+1. SQL Server:
+   - Advanced queries
+   - Stored procedures
+   - Views ve functions
+   - Performance optimization
+
+2. Presentation Preparation:
+   - Content organization
+   - Visual materials
+   - Technical documentation
+   - Audience engagement
+
+3. Database Design:
+   - Schema optimization
+   - Query performance
+   - Data consistency
+   - Best practices
+
+==========================================
+PROJE TAMAMLAMA
+==========================================
+
+✅ Tam işlevsel masaj randevu sistemi
+✅ Modern ve responsive kullanıcı arayüzü
+✅ Güvenli authentication sistemi
+✅ Email notification sistemi
+✅ Kapsamlı admin paneli
+✅ Payment system integration
+✅ UML documentation
+✅ MSSQL presentation materials
+
+==========================================
+STAJ DEĞERLENDİRMESİ
+==========================================
+
+Bu staj sürecinde:
+- Full-stack development deneyimi kazanıldı
+- Modern web technologies öğrenildi
+- Problem-solving skills geliştirildi
+- Team collaboration experience edinildi
+- Production-level coding standards öğrenildi
+- Database management skills geliştirildi
+- Documentation ve presentation skills
+
+==========================================
+NOTLAR
+==========================================
+
+- Proje başarıyla tamamlandı
+- Tüm hedefler gerçekleştirildi
+- MSSQL sunum materyalleri hazır
+- Mentörüm Hüseyin Çobanoğlu çok yardımcı oldu
+
+==========================================
+İMZA
+==========================================
+
+Tarih: 15 Ağustos 2025
+İmza: _________________

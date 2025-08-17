@@ -177,31 +177,30 @@ namespace WebApplication1.Api.Services
         {
             try
             {
-                var email = new MimeMessage();
-                
-                // Gönderen bilgileri (gerçek projede appsettings'den alınmalı)
-                email.From.Add(new MailboxAddress("L'OR Masaj Merkezi", "noreply@lor-masaj.com"));
-                email.To.Add(MailboxAddress.Parse(toEmail));
-                email.Subject = subject;
-                
-                // HTML içerik
-                email.Body = new TextPart(TextFormat.Html) { Text = htmlBody };
+                var host = _configuration["EmailSettings:Host"];
+                var port = int.Parse(_configuration["EmailSettings:Port"]);
+                var username = _configuration["EmailSettings:Username"];
+                var password = _configuration["EmailSettings:Password"];
 
-                // SMTP ayarları (gerçek projede appsettings'den alınmalı)
-                using var smtp = new SmtpClient();
-                
-                // Test için Gmail SMTP kullanıyoruz (gerçek projede değiştirilmeli)
-                var host = _configuration["EmailSettings:Host"] ?? "smtp.gmail.com";
-                var port = int.Parse(_configuration["EmailSettings:Port"] ?? "587");
-                var username = _configuration["EmailSettings:Username"] ?? "";
-                var password = _configuration["EmailSettings:Password"] ?? "";
-
-                if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+                // Test modu - gerçek email bilgileri yoksa sadece log at
+                if (string.IsNullOrEmpty(username) || username == "test@example.com" || 
+                    string.IsNullOrEmpty(password) || password == "testpassword")
                 {
-                    _logger.LogWarning("Email ayarları bulunamadı. Email gönderilemiyor.");
+                    _logger.LogInformation("=== EMAIL TEST MODE ===");
+                    _logger.LogInformation($"To: {toEmail}");
+                    _logger.LogInformation($"Subject: {subject}");
+                    _logger.LogInformation($"Body: {htmlBody}");
+                    _logger.LogInformation("=== END EMAIL TEST MODE ===");
                     return;
                 }
 
+                var email = new MimeMessage();
+                email.From.Add(new MailboxAddress("L'OR Masaj Merkezi", username));
+                email.To.Add(MailboxAddress.Parse(toEmail));
+                email.Subject = subject;
+                email.Body = new TextPart(TextFormat.Html) { Text = htmlBody };
+
+                using var smtp = new SmtpClient();
                 await smtp.ConnectAsync(host, port, MailKit.Security.SecureSocketOptions.StartTls);
                 await smtp.AuthenticateAsync(username, password);
                 await smtp.SendAsync(email);
@@ -212,7 +211,6 @@ namespace WebApplication1.Api.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Email gönderilirken hata oluştu: {toEmail}");
-                // Hata durumunda uygulama çökmemeli, sadece log atılmalı
             }
         }
     }

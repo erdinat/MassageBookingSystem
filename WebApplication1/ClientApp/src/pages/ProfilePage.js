@@ -33,26 +33,26 @@ const ProfilePage = () => {
       console.log('User ID:', currentUser.id);
       
       if (!token || !currentUser.id) {
+        console.log('No token or user ID, redirecting to auth');
         navigate('/auth');
         return;
       }
       
-      // Eğer user ID 3 ise ve veritabanında yoksa, localStorage'ı temizle
-      if (currentUser.id === 3) {
-        console.log('Invalid user ID detected, clearing localStorage...');
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
-        navigate('/auth');
-        return;
-      }
-      
-      const response = await fetch(`/api/auth/profile/${currentUser.id}`, {
+      const response = await fetch(`http://localhost:5058/api/auth/profile/${currentUser.id}`, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
       
       if (!response.ok) {
+        if (response.status === 401) {
+          console.log('Unauthorized, clearing localStorage and redirecting');
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          navigate('/auth');
+          return;
+        }
         throw new Error(`HTTP ${response.status}`);
       }
       
@@ -93,7 +93,7 @@ const ProfilePage = () => {
     e.preventDefault();
     try {
       const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-      const response = await fetch(`/api/auth/profile/${currentUser.id}`, {
+      const response = await fetch(`http://localhost:5058/api/auth/profile/${currentUser.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -127,7 +127,7 @@ const ProfilePage = () => {
     }
     try {
       const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-      const response = await fetch(`/api/auth/change-password/${currentUser.id}`, {
+      const response = await fetch(`http://localhost:5058/api/auth/change-password/${currentUser.id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -155,7 +155,7 @@ const ProfilePage = () => {
   const handleRemoveFavorite = async (therapistId) => {
     try {
         const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-        const response = await fetch(`/api/auth/favorites/${currentUser.id}/remove/${therapistId}`, {
+        const response = await fetch(`http://localhost:5058/api/auth/favorites/${currentUser.id}/remove/${therapistId}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`

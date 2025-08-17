@@ -70,4 +70,10 @@ namespace WebApplication1.Api.DTOs
         public string NewPassword { get; set; } = string.Empty;
         public string ConfirmNewPassword { get; set; } = string.Empty;
     }
+
+    public class VerifyEmailRequest
+    {
+        public string Email { get; set; } = string.Empty;
+        public string Token { get; set; } = string.Empty;
+    }
 }

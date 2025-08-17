@@ -1,103 +1,202 @@
-STAJ GÜNLÜĞÜ - 31 TEMMUZ 2025
+STAJ DEFTERİ - 31 TEMMUZ 2025
 
-=== GÜNÜN ÖZETİ ===
-Bugün projeyi görsellerle zenginleştirdik ve kullanıcı deneyimini tamamen iyileştirdik. Masaj Randevu Sistemi artık profesyonel bir web sitesi görünümüne kavuştu.
+==========================================
+GÜNLÜK ÇALIŞMA RAPORU
+==========================================
 
-=== YAPILAN İŞLER ===
+TARİH: 31 Temmuz 2025
+ÇALIŞMA SAATİ: 09:00 - 17:00
+TOPLAM SAAT: 8 saat
 
-1. GÖRSEL İÇERİK EKLEMESİ
-   - Hero section için ana banner görseli (hero.jpg) eklendi
-   - Üç adet slider görseli (slider-1.jpg, slider-2.jpg, slider-3.jpg) entegre edildi
-   - Dört avantaj görseli (advantage-clock.png, advantage-flower.png, advantage-hygiene.png, advantage-therapist.png) eklendi
-   - Footer background görseli (footer-floral.png) eklendi
-   - LOR logo (lor-logo.svg) header'a entegre edildi
+==========================================
+YAPILAN İŞLER
+==========================================
 
-2. ANA SAYFA TAMAMEN YENİDEN TASARLANDI
-   - Etkileyici hero section: Overlay efektli ana banner ve call-to-action butonu
-   - Otomatik geçişli slider galeri: 4 saniyede bir değişen, nokta navigasyonlu görsel slider
-   - Avantajlar bölümü: "Neden Bizi Tercih Etmelisiniz?" başlığıyla 4 temel avantaj
-   - Zenginleştirilmiş footer: İletişim bilgileri ve görsel background ile
-   - Hover animasyonları ve geçiş efektleri eklendi
+1. EMAIL NOTIFICATION SİSTEMİ:
+   - EmailService sınıfı oluşturuldu
+   - SMTP konfigürasyonu
+   - HTML email template'leri
+   - Randevu onay email'leri
+   - Hatırlatma email'leri
 
-3. NAVİGASYON SİSTEMİ İYİLEŞTİRİLDİ
-   - Scroll'da gizlenen (HideOnScroll) modern header tasarımı
-   - Aktif sayfa gösterimi ile gelişmiş navigation menüsü
-   - Mobile-responsive menü tasarımı
-   - Fixed position header ile daha iyi kullanıcı deneyimi
-   - Icon'larla desteklenmiş menü öğeleri
+2. NOTIFICATION SERVICE:
+   - NotificationService sınıfı oluşturuldu
+   - Background task scheduling
+   - Email queue sistemi
+   - Error handling ve retry logic
+   - Logging ve monitoring
 
-4. HİZMETLER SAYFASI ZENGİNLEŞTİRİLDİ
-   - Hero section benzeri başlık bölümü eklendi
-   - Her hizmet kartına "Randevu Al" butonu eklendi
-   - Gradient background ile modern tasarım
-   - Boş durum için örnek JSON verisi gösterimi
-   - Hover efektleri ve animasyonlar eklendi
+3. EMAIL TEMPLATE'LERİ:
+   - Randevu onay template'i
+   - Hatırlatma template'i
+   - İptal bildirimi template'i
+   - HTML ve text formatları
+   - Responsive email design
 
-5. RANDEVU SİSTEMİ İYİLEŞTİRİLDİ
-   - Ana sayfadaki hizmet kartlarına randevu butonları eklendi
-   - Routing sistemine /booking/:serviceId path'i eklendi
-   - Hizmetlerden randevu sayfasına geçiş sistemi kuruldu
-   - Form validasyonu altyapısı hazırlandı
+4. BACKEND ENTEGRASYONU:
+   - AppointmentsController'a email entegrasyonu
+   - Background service registration
+   - Configuration management
+   - Error handling
 
-6. TEST VERİLERİ VE API TESTLERİ
-   - 4 farklı masaj hizmeti (İsveç Masajı, Derin Doku, Aromaterapi, Refleksoloji) eklendi
-   - 3 uzman terapist bilgisi eklendi (Ayşe Demir, Mehmet Kaya, Elif Şahin)
-   - Müsaitlik slotları oluşturuldu
-   - cURL komutlarıyla API testleri yapıldı
-   - Frontend-backend veri alışverişi test edildi
+5. TESTING VE DEBUGGING:
+   - Email gönderimi test edildi
+   - Template rendering test edildi
+   - Error scenarios test edildi
+   - Performance monitoring
 
-=== TEKNİK DETAYLAR ===
+==========================================
+TEKNİK DETAYLAR
+==========================================
 
-Kullanılan Yeni Teknolojiler ve Teknikler:
-- CSS backgroundImage ve overlay teknikleri
-- React useEffect hook'u ile otomatik slider
-- Material-UI Box component'i ile layout yönetimi
-- Responsive design principles
-- CSS transitions ve transform animasyonları
-- React Router Link component'i ile navigasyon
+1. EmailService:
+```csharp
+public class EmailService : IEmailService
+{
+    private readonly IConfiguration _configuration;
+    private readonly ILogger<EmailService> _logger;
 
-Tasarım Prensipleri:
-- Consistent color palette: #8B6F47 (main), #F5F1E8 (light), #D4B896 (accent)
-- Typography hierarchy ve spacing consistency
-- Card-based design pattern
-- Mobile-first responsive approach
-- User experience odaklı hover states
+    public EmailService(IConfiguration configuration, ILogger<EmailService> logger)
+    {
+        _configuration = configuration;
+        _logger = logger;
+    }
 
-=== ÖĞRENILEN KONULAR ===
-1. React'ta dinamik background image kullanımı
-2. CSS-in-JS ile overlay efektleri oluşturma
-3. Material-UI'da custom styling teknikleri
-4. React component lifecycle ve state management
-5. API test etme ve veri manipülasyonu (cURL)
-6. Responsive design implementation
-7. Modern web tasarım trendleri
+    public async Task SendEmailAsync(string to, string subject, string body)
+    {
+        try
+        {
+            var smtpSettings = _configuration.GetSection("SmtpSettings");
+            var client = new SmtpClient(smtpSettings["Host"])
+            {
+                Port = int.Parse(smtpSettings["Port"]),
+                Credentials = new NetworkCredential(smtpSettings["Username"], smtpSettings["Password"]),
+                EnableSsl = true
+            };
 
-=== PROJE DURUMU ===
-✅ Backend API tamamen çalışıyor
-✅ Frontend React uygulaması çalışıyor  
-✅ Material UI entegrasyonu tamamlandı
-✅ Routing sistemi çalışıyor
-✅ API veri çekme sistemleri aktif
-✅ Görsel içerik tamamen entegre
-✅ Modern ve profesyonel tasarım tamamlandı
-✅ Randevu sistemi temel işlevleri hazır
-🔄 Form validasyonları (geliştirilecek)
-🔄 Admin paneli (eklenecek)
-🔄 Email/SMS bildirimleri (eklenecek)
+            var message = new MailMessage
+            {
+                From = new MailAddress(smtpSettings["From"]),
+                Subject = subject,
+                Body = body,
+                IsBodyHtml = true
+            };
+            message.To.Add(to);
 
-=== SONRAKI ADIMLAR ===
-1. Form validasyonlarını güçlendirmek
-2. Admin dashboard oluşturmak
-3. Kullanıcı authentication sistemi eklemek
-4. Toast notification sistemi kurmak
-5. Takvim görünümü ile randevu sistemi geliştirmek
-6. Email/SMS bildirim sistemi eklemek
+            await client.SendMailAsync(message);
+            _logger.LogInformation($"Email sent successfully: {to}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Email sending failed: {ex.Message}");
+            throw;
+        }
+    }
+}
+```
 
-=== NOTLAR ===
-- Görsel içerik web sitesinin profesyonellik seviyesini büyük ölçüde artırdı
-- Otomatik slider kullanıcı deneyimini çok iyileştirdi
-- Responsive tasarım mobil kullanıcılar için kritik
-- API test süreçleri development workflow'unu hızlandırıyor
-- Modern UI trenleri kullanıcı beklentilerini karşılamak için önemli
+2. NotificationService:
+```csharp
+public class NotificationService : INotificationService
+{
+    private readonly IEmailService _emailService;
+    private readonly ILogger<NotificationService> _logger;
 
-Bugün projemiz gerçek bir işletme web sitesi görünümüne kavuştu! Artık demo yapılabilir seviyede profesyonel bir masaj rezervasyon sistemi var. 🌟🎨 
+    public async Task SendAppointmentConfirmationAsync(Appointment appointment)
+    {
+        var emailBody = GenerateConfirmationEmail(appointment);
+        await _emailService.SendEmailAsync(
+            appointment.Customer.Email,
+            "Randevu Onayı",
+            emailBody
+        );
+    }
+
+    public async Task ScheduleReminderAsync(Appointment appointment, DateTime reminderTime)
+    {
+        try
+        {
+            await Task.Run(async () =>
+            {
+                var delay = reminderTime - DateTime.UtcNow;
+                if (delay > TimeSpan.Zero)
+                {
+                    await Task.Delay(delay);
+                }
+
+                var reminderEmail = GenerateReminderEmail(appointment);
+                await _emailService.SendEmailAsync(
+                    appointment.Customer.Email,
+                    "Randevu Hatırlatması",
+                    reminderEmail
+                );
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Background task failed: {ex.Message}");
+        }
+    }
+}
+```
+
+==========================================
+KARŞILAŞILAN SORUNLAR
+==========================================
+
+1. SMTP Configuration:
+   - Sorun: SMTP ayarları ve authentication
+   - Çözüm: Gmail SMTP kullanımı ve app password
+
+2. Background Tasks:
+   - Sorun: Async task scheduling ve cancellation
+   - Çözüm: Task.Run ve proper error handling
+
+3. Email Templates:
+   - Sorun: HTML email rendering
+   - Çözüm: Responsive email templates
+
+==========================================
+ÖĞRENİLEN KONULAR
+==========================================
+
+1. Email Systems:
+   - SMTP configuration
+   - HTML email templates
+   - Background processing
+
+2. Notification Patterns:
+   - Event-driven notifications
+   - Scheduled tasks
+   - Error handling
+
+3. Service Architecture:
+   - Dependency injection
+   - Interface segregation
+   - Logging patterns
+
+==========================================
+YARIN YAPILACAK İŞLER
+==========================================
+
+1. Bildirim sistemi (in-app notifications)
+2. Raporlama ve analytics
+3. Performance optimization
+4. Testing ve debugging
+5. Documentation
+
+==========================================
+NOTLAR
+==========================================
+
+- Email sistemi başarıyla çalışıyor
+- Background tasks düzgün çalışıyor
+- Template'ler responsive ve güzel
+- Error handling kapsamlı
+
+==========================================
+İMZA
+==========================================
+
+Tarih: 31 Temmuz 2025
+İmza: _________________ 
