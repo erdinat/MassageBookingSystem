@@ -270,5 +270,80 @@ namespace WebApplication1.Api.Controllers
             }
         }
 
+        [HttpPost("favorites/{userId}/add/{therapistId}")]
+        public async Task<ActionResult<AuthResponse>> AddFavoriteTherapist(int userId, int therapistId, [FromHeader(Name = "Authorization")] string? authorization)
+        {
+            try
+            {
+                var result = await _authService.AddFavoriteTherapistAsync(userId, therapistId);
+                
+                if (result.Success)
+                {
+                    return Ok(result);
+                }
+                
+                return BadRequest(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error adding favorite therapist");
+                return StatusCode(500, new AuthResponse 
+                { 
+                    Success = false, 
+                    Message = "Sunucu hatası" 
+                });
+            }
+        }
+
+        [HttpDelete("favorites/{userId}/remove/{therapistId}")]
+        public async Task<ActionResult<AuthResponse>> RemoveFavoriteTherapist(int userId, int therapistId, [FromHeader(Name = "Authorization")] string? authorization)
+        {
+            try
+            {
+                var result = await _authService.RemoveFavoriteTherapistAsync(userId, therapistId);
+                
+                if (result.Success)
+                {
+                    return Ok(result);
+                }
+                
+                return BadRequest(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error removing favorite therapist");
+                return StatusCode(500, new AuthResponse 
+                { 
+                    Success = false, 
+                    Message = "Sunucu hatası" 
+                });
+            }
+        }
+
+        [HttpGet("favorites/{userId}")]
+        public async Task<ActionResult<AuthResponse>> GetFavoriteTherapists(int userId, [FromHeader(Name = "Authorization")] string? authorization)
+        {
+            try
+            {
+                var result = await _authService.GetFavoriteTherapistsAsync(userId);
+                
+                if (result.Success)
+                {
+                    return Ok(result);
+                }
+                
+                return BadRequest(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting favorite therapists");
+                return StatusCode(500, new AuthResponse 
+                { 
+                    Success = false, 
+                    Message = "Sunucu hatası" 
+                });
+            }
+        }
+
     }
 }

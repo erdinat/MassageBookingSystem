@@ -13,6 +13,7 @@ namespace WebApplication1.Api.Data
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<UserFavoriteTherapist> UserFavoriteTherapists { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

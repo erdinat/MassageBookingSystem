@@ -94,6 +94,30 @@ function BookingPage() {
     cvv: ''
   });
   const [paymentError, setPaymentError] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Load user info from localStorage if logged in
+  useEffect(() => {
+    const loadUserInfo = () => {
+      try {
+        const currentUser = JSON.parse(localStorage.getItem('user') || 'null');
+        if (currentUser && currentUser.id) {
+          // Giriş yapmış kullanıcının bilgilerini form alanlarına doldur
+          setCustomerInfo({
+            name: currentUser.name || '',
+            surname: currentUser.surname || '',
+            phone: currentUser.phone || '',
+            email: currentUser.email || ''
+          });
+          setIsLoggedIn(true);
+        }
+      } catch (error) {
+        console.error('Kullanıcı bilgileri yüklenirken hata:', error);
+      }
+    };
+
+    loadUserInfo();
+  }, []);
 
   // Load service details
   useEffect(() => {
@@ -550,114 +574,124 @@ function BookingPage() {
             <Typography variant="h5" sx={{ color: '#8B6F47', mb: 3, fontWeight: 'bold', textAlign: 'center' }}>
               İletişim Bilgileriniz
             </Typography>
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Ad"
-                  name="name"
-                  value={customerInfo.name}
-                  onChange={handleInputChange}
-                  fullWidth
-                  required
-                  sx={{
-                    '& .MuiInputBase-root': {
-                      backgroundColor: '#F5F1E8',
+            
+            {isLoggedIn && (
+              <Alert severity="info" sx={{ mb: 3, backgroundColor: 'rgba(139, 111, 71, 0.1)', border: '1px solid #D4B896' }}>
+                Giriş yapmış kullanıcı olarak bilgileriniz otomatik olarak doldurulmuştur.
+              </Alert>
+            )}
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              <TextField
+                label="Ad"
+                name="name"
+                value={customerInfo.name}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                InputProps={{
+                  readOnly: isLoggedIn,
+                }}
+                sx={{
+                  '& .MuiInputBase-root': {
+                    backgroundColor: '#F5F1E8',
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#8B6F47',
+                  },
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: '#D4B896',
                     },
-                    '& .MuiInputLabel-root': {
-                      color: '#8B6F47',
+                    '&:hover fieldset': {
+                      borderColor: '#8B6F47',
                     },
-                    '& .MuiOutlinedInput-root': {
-                      '& fieldset': {
-                        borderColor: '#D4B896',
-                      },
-                      '&:hover fieldset': {
-                        borderColor: '#8B6F47',
-                      },
+                  },
+                }}
+              />
+              <TextField
+                label="Soyad"
+                name="surname"
+                value={customerInfo.surname}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                InputProps={{
+                  readOnly: isLoggedIn,
+                }}
+                sx={{
+                  '& .MuiInputBase-root': {
+                    backgroundColor: '#F5F1E8',
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#8B6F47',
+                  },
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: '#D4B896',
                     },
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Soyad"
-                  name="surname"
-                  value={customerInfo.surname}
-                  onChange={handleInputChange}
-                  fullWidth
-                  required
-                  sx={{
-                    '& .MuiInputBase-root': {
-                      backgroundColor: '#F5F1E8',
+                    '&:hover fieldset': {
+                      borderColor: '#8B6F47',
                     },
-                    '& .MuiInputLabel-root': {
-                      color: '#8B6F47',
+                  },
+                }}
+              />
+              <TextField
+                label="Telefon"
+                name="phone"
+                type="tel"
+                value={customerInfo.phone}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                InputProps={{
+                  readOnly: isLoggedIn,
+                }}
+                sx={{
+                  '& .MuiInputBase-root': {
+                    backgroundColor: '#F5F1E8',
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#8B6F47',
+                  },
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: '#D4B896',
                     },
-                    '& .MuiOutlinedInput-root': {
-                      '& fieldset': {
-                        borderColor: '#D4B896',
-                      },
-                      '&:hover fieldset': {
-                        borderColor: '#8B6F47',
-                      },
+                    '&:hover fieldset': {
+                      borderColor: '#8B6F47',
                     },
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Telefon"
-                  name="phone"
-                  type="tel"
-                  value={customerInfo.phone}
-                  onChange={handleInputChange}
-                  fullWidth
-                  required
-                  sx={{
-                    '& .MuiInputBase-root': {
-                      backgroundColor: '#F5F1E8',
+                  },
+                }}
+              />
+              <TextField
+                label="E-posta"
+                name="email"
+                type="email"
+                value={customerInfo.email}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                InputProps={{
+                  readOnly: isLoggedIn,
+                }}
+                sx={{
+                  '& .MuiInputBase-root': {
+                    backgroundColor: '#F5F1E8',
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#8B6F47',
+                  },
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: '#D4B896',
                     },
-                    '& .MuiInputLabel-root': {
-                      color: '#8B6F47',
+                    '&:hover fieldset': {
+                      borderColor: '#8B6F47',
                     },
-                    '& .MuiOutlinedInput-root': {
-                      '& fieldset': {
-                        borderColor: '#D4B896',
-                      },
-                      '&:hover fieldset': {
-                        borderColor: '#8B6F47',
-                      },
-                    },
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="E-posta"
-                  name="email"
-                  type="email"
-                  value={customerInfo.email}
-                  onChange={handleInputChange}
-                  fullWidth
-                  required
-                  sx={{
-                    '& .MuiInputBase-root': {
-                      backgroundColor: '#F5F1E8',
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: '#8B6F47',
-                    },
-                    '& .MuiOutlinedInput-root': {
-                      '& fieldset': {
-                        borderColor: '#D4B896',
-                      },
-                      '&:hover fieldset': {
-                        borderColor: '#8B6F47',
-                      },
-                    },
-                  }}
-                />
-              </Grid>
-            </Grid>
+                  },
+                }}
+              />
+            </Box>
             
             {/* Booking Summary */}
             <Card sx={{ mt: 4, backgroundColor: 'rgba(139, 111, 71, 0.1)', border: '2px solid #D4B896' }}>

@@ -84,6 +84,12 @@ function AppointmentManagementPage() {
     severity: 'success'
   });
 
+  // Different Email Dialog
+  const [differentEmailDialog, setDifferentEmailDialog] = useState({
+    open: false,
+    email: ''
+  });
+
   const loadAppointments = async () => {
     if (!customerEmail) return;
     
@@ -484,8 +490,17 @@ function AppointmentManagementPage() {
             <Button
               variant="outlined"
               onClick={() => {
-                setEmailEntered(false);
-                setCustomerEmail('');
+                if (isLoggedIn) {
+                  // Giriş yapmış kullanıcı için dialog aç
+                  setDifferentEmailDialog({
+                    open: true,
+                    email: ''
+                  });
+                } else {
+                  // Giriş yapmamış kullanıcı için e-posta giriş formunu göster
+                  setEmailEntered(false);
+                  setCustomerEmail('');
+                }
               }}
               sx={{
                 color: '#8B6F47',
@@ -674,6 +689,77 @@ function AppointmentManagementPage() {
               }}
             >
               Güncelle
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Different Email Dialog */}
+        <Dialog
+          open={differentEmailDialog.open}
+          onClose={() => setDifferentEmailDialog({ open: false, email: '' })}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogTitle sx={{ backgroundColor: '#F5F1E8', color: '#8B6F47', fontWeight: 'bold' }}>
+            Farklı E-posta Adresi
+          </DialogTitle>
+          <DialogContent sx={{ backgroundColor: '#F5F1E8', pt: 3 }}>
+            <Typography variant="body1" sx={{ mb: 3, color: '#8B6F47' }}>
+              Farklı bir e-posta adresi ile randevuları görüntülemek istiyorsanız, e-posta adresini girin:
+            </Typography>
+            <TextField
+              fullWidth
+              label="E-posta Adresi"
+              type="email"
+              value={differentEmailDialog.email}
+              onChange={(e) => setDifferentEmailDialog({
+                ...differentEmailDialog,
+                email: e.target.value
+              })}
+              required
+              sx={{
+                '& .MuiInputBase-root': {
+                  backgroundColor: 'white'
+                },
+                '& .MuiInputLabel-root': {
+                  color: '#8B6F47'
+                },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: '#D4B896'
+                  },
+                  '&:hover fieldset': {
+                    borderColor: '#8B6F47'
+                  }
+                }
+              }}
+            />
+          </DialogContent>
+          <DialogActions sx={{ backgroundColor: '#F5F1E8', p: 3 }}>
+            <Button 
+              onClick={() => setDifferentEmailDialog({ open: false, email: '' })}
+              sx={{ color: '#8B6F47' }}
+            >
+              İptal
+            </Button>
+            <Button 
+              onClick={() => {
+                if (differentEmailDialog.email.trim()) {
+                  setCustomerEmail(differentEmailDialog.email);
+                  setEmailEntered(true);
+                  setDifferentEmailDialog({ open: false, email: '' });
+                }
+              }}
+              variant="contained"
+              disabled={!differentEmailDialog.email.trim()}
+              sx={{
+                backgroundColor: '#8B6F47',
+                '&:hover': {
+                  backgroundColor: '#6B5437'
+                }
+              }}
+            >
+              Randevuları Göster
             </Button>
           </DialogActions>
         </Dialog>

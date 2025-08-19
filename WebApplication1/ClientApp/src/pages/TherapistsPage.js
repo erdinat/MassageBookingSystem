@@ -8,21 +8,30 @@ import {
   Avatar,
   Box,
   Chip,
-  CircularProgress
+  CircularProgress,
+  IconButton,
+  Tooltip,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import { 
   Person as PersonIcon,
   Psychology as ExpertIcon,
-  Star as StarIcon
+  Star as StarIcon,
+  Favorite as FavoriteIcon,
+  FavoriteBorder as FavoriteBorderIcon
 } from '@mui/icons-material';
 
 function TherapistsPage() {
   const [therapists, setTherapists] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [favoriteTherapists, setFavoriteTherapists] = useState([]);
+  const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' });
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
     // API'den terapistleri çek
-    fetch('/api/therapists')
+    fetch('http://localhost:5058/api/therapists')
       .then(response => response.json())
       .then(data => {
         setTherapists(data);
@@ -32,7 +41,102 @@ function TherapistsPage() {
         console.error('Terapistler yüklenirken hata:', error);
         setLoading(false);
       });
+
+    // Kullanıcı giriş yapmışsa favori terapistleri çek
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    setCurrentUser(user);
+    if (user.id && user.role === 'Customer') {
+      fetchFavoriteTherapists(user.id);
+    }
   }, []);
+
+  const fetchFavoriteTherapists = async (userId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5058/api/auth/favorites/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        try {
+          const data = await response.json();
+          if (data.success && data.favoriteTherapists) {
+            setFavoriteTherapists(data.favoriteTherapists);
+          }
+        } catch (error) {
+          console.error('JSON parse error:', error);
+        }
+      }
+    } catch (error) {
+      console.error('Favori terapistler yüklenirken hata:', error);
+    }
+  };
+
+  const handleToggleFavorite = async (therapistId) => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      if (!user.id) {
+        setNotification({ open: true, message: 'Favori eklemek için giriş yapmalısınız.', severity: 'warning' });
+        return;
+      }
+
+      if (user.role !== 'Customer') {
+        setNotification({ open: true, message: 'Sadece müşteriler favori terapist ekleyebilir.', severity: 'warning' });
+        return;
+      }
+
+      const token = localStorage.getItem('token');
+      const isFavorite = favoriteTherapists.some(ft => ft.id === therapistId);
+      
+      const url = isFavorite 
+        ? `http://localhost:5058/api/auth/favorites/${user.id}/remove/${therapistId}`
+        : `http://localhost:5058/api/auth/favorites/${user.id}/add/${therapistId}`;
+      
+      const method = isFavorite ? 'DELETE' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setNotification({ open: true, message: data.message, severity: 'success' });
+        
+        // Favori listesini güncelle
+        if (isFavorite) {
+          setFavoriteTherapists(prev => prev.filter(ft => ft.id !== therapistId));
+        } else {
+          const therapist = therapists.find(t => t.id === therapistId);
+          if (therapist) {
+            setFavoriteTherapists(prev => [...prev, therapist]);
+          }
+        }
+      } else {
+        try {
+          const data = await response.json();
+          setNotification({ open: true, message: data.message || 'Bir hata oluştu.', severity: 'error' });
+        } catch (error) {
+          setNotification({ open: true, message: `HTTP ${response.status}: ${response.statusText}`, severity: 'error' });
+        }
+      }
+    } catch (error) {
+      console.error('Favori işlemi sırasında hata:', error);
+      setNotification({ open: true, message: 'Bir hata oluştu.', severity: 'error' });
+    }
+  };
+
+  const isFavorite = (therapistId) => {
+    return favoriteTherapists.some(ft => ft.id === therapistId);
+  };
+
+  const handleNotificationClose = () => {
+    setNotification(prev => ({ ...prev, open: false }));
+  };
 
   if (loading) {
     return (
@@ -107,7 +211,7 @@ function TherapistsPage() {
             </Grid>
           ) : (
             therapists.map((therapist) => (
-              <Grid item xs={12} md={6} lg={4} key={therapist.id} sx={{ display: 'flex' }}>
+              <Grid item xs={12} md={6} key={therapist.id} sx={{ display: 'flex' }}>
                 <Card sx={{ 
                   width: '100%',
                   display: 'flex',
@@ -119,8 +223,28 @@ function TherapistsPage() {
                   transition: 'all 0.3s ease',
                   backgroundColor: '#FEFEFE',
                   border: '1px solid #E0E0E0',
-                  height: '350px'
+                  height: '350px',
+                  position: 'relative'
                 }}>
+                  {currentUser && currentUser.role === 'Customer' && (
+                    <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}>
+                      <Tooltip title={isFavorite(therapist.id) ? "Favorilerden Kaldır" : "Favorilere Ekle"}>
+                        <IconButton 
+                          onClick={() => handleToggleFavorite(therapist.id)}
+                          sx={{ 
+                            color: isFavorite(therapist.id) ? '#C62828' : '#8B6F47',
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            '&:hover': {
+                              backgroundColor: 'rgba(255, 255, 255, 1)',
+                              transform: 'scale(1.1)'
+                            }
+                          }}
+                        >
+                          {isFavorite(therapist.id) ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  )}
                   <CardContent sx={{ 
                     textAlign: 'center',
                     p: 3,
@@ -190,6 +314,17 @@ function TherapistsPage() {
           )}
         </Grid>
       </Container>
+
+      <Snackbar 
+        open={notification.open} 
+        autoHideDuration={6000} 
+        onClose={handleNotificationClose} 
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleNotificationClose} severity={notification.severity} sx={{ width: '100%' }} variant="filled">
+          {notification.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

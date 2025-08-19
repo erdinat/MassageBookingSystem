@@ -26,5 +26,6 @@ namespace WebApplication1.Api.Models
         // Navigation properties
         public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
         public Therapist? TherapistProfile { get; set; }
+        public ICollection<UserFavoriteTherapist> FavoriteTherapists { get; set; } = new List<UserFavoriteTherapist>();
     }
 }

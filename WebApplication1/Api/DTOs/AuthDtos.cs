@@ -22,6 +22,7 @@ namespace WebApplication1.Api.DTOs
         public string Message { get; set; } = string.Empty;
         public UserDto? User { get; set; }
         public string? Token { get; set; }
+        public object? FavoriteTherapists { get; set; }
     }
 
     public class UserDto

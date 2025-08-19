@@ -17,7 +17,7 @@ const pageVariants = {
 };
 
 const ProfilePage = () => {
-  const [user, setUser] = useState({ name: '', surname: '', email: '', phone: '' });
+  const [user, setUser] = useState({ name: '', surname: '', email: '', phone: '', role: '' });
   const [favoriteTherapists, setFavoriteTherapists] = useState([]);
   const [editMode, setEditMode] = useState(false);
   const [passwordData, setPasswordData] = useState({ oldPassword: '', newPassword: '', confirmPassword: '' });
@@ -62,8 +62,25 @@ const ProfilePage = () => {
         surname: data.surname,
         email: data.email,
         phone: data.phone || '',
+        role: data.role || '',
       });
-      setFavoriteTherapists(data.favoriteTherapists || []);
+      
+      // Favori terapistleri ayrı API çağrısı ile al
+      if (data.role === 'Customer') {
+        const favoritesResponse = await fetch(`http://localhost:5058/api/auth/favorites/${currentUser.id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (favoritesResponse.ok) {
+          const favoritesData = await favoritesResponse.json();
+          if (favoritesData.success && favoritesData.favoriteTherapists) {
+            setFavoriteTherapists(favoritesData.favoriteTherapists);
+          }
+        }
+      }
     } catch (error) {
       console.error('Kullanıcı verileri alınamadı', error);
       setNotification({ open: true, message: 'Kullanıcı verileri alınamadı.', severity: 'error' });
@@ -245,38 +262,70 @@ const ProfilePage = () => {
             </Paper>
           </Grid>
           
-          <Grid item xs={12} md={6}>
-            <Paper elevation={3} sx={{ p: 4, borderRadius: 4, backgroundColor: 'rgba(255, 255, 255, 0.8)', height: '100%' }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                <FavoriteIcon sx={{ fontSize: 40, color: '#C62828', mr: 2 }} />
-                <Typography variant="h5" sx={{ fontWeight: '600', color: '#5D4037' }}>Favori Terapistler</Typography>
-              </Box>
-              <Divider sx={{ mb: 2 }}/>
-              {favoriteTherapists.length > 0 ? (
-                <List>
-                  {favoriteTherapists.map(therapist => (
-                    <motion.div key={therapist.id} layout>
-                        <ListItem>
-                            <Avatar sx={{ mr: 2, bgcolor: '#8B6F47' }}>{therapist.name.charAt(0)}</Avatar>
-                            <ListItemText primary={therapist.name} secondary={therapist.bio} />
-                            <ListItemSecondaryAction>
-                                <Tooltip title="Favorilerden Kaldır">
-                                    <IconButton edge="end" aria-label="delete" onClick={() => handleRemoveFavorite(therapist.id)}>
-                                        <DeleteIcon color="error" />
-                                    </IconButton>
-                                </Tooltip>
-                            </ListItemSecondaryAction>
-                        </ListItem>
-                    </motion.div>
-                  ))}
-                </List>
-              ) : (
-                <Typography sx={{ textAlign: 'center', mt: 4, color: 'text.secondary' }}>
-                  Henüz favori terapistiniz bulunmuyor.
-                </Typography>
-              )}
-            </Paper>
-          </Grid>
+          {user.role === 'Customer' && (
+            <Grid item xs={12} md={6}>
+              <Paper elevation={3} sx={{ p: 4, borderRadius: 4, backgroundColor: 'rgba(255, 255, 255, 0.8)', minHeight: '400px', maxHeight: '600px', overflow: 'auto' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                  <FavoriteIcon sx={{ fontSize: 40, color: '#C62828', mr: 2 }} />
+                  <Typography variant="h5" sx={{ fontWeight: '600', color: '#5D4037' }}>Favori Terapistler</Typography>
+                </Box>
+                <Divider sx={{ mb: 3 }}/>
+                {favoriteTherapists.length > 0 ? (
+                  <List sx={{ mt: 2, pb: 2 }}>
+                    {favoriteTherapists.map(therapist => (
+                      <motion.div key={therapist.id} layout>
+                          <ListItem sx={{ 
+                            mb: 1, 
+                            borderRadius: 1, 
+                            backgroundColor: 'rgba(139, 111, 71, 0.05)',
+                            '&:hover': {
+                              backgroundColor: 'rgba(139, 111, 71, 0.1)'
+                            }
+                          }}>
+                              <Avatar sx={{ mr: 2, bgcolor: '#8B6F47' }}>{therapist.name.charAt(0)}</Avatar>
+                              <ListItemText 
+                                primary={therapist.name} 
+                                secondary={therapist.bio}
+                                sx={{
+                                  '& .MuiListItemText-primary': {
+                                    fontWeight: '600',
+                                    color: '#8B6F47'
+                                  },
+                                  '& .MuiListItemText-secondary': {
+                                    fontSize: '0.875rem'
+                                  }
+                                }}
+                              />
+                              <ListItemSecondaryAction>
+                                  <Tooltip title="Favorilerden Kaldır">
+                                      <IconButton edge="end" aria-label="delete" onClick={() => handleRemoveFavorite(therapist.id)}>
+                                          <DeleteIcon color="error" />
+                                      </IconButton>
+                                  </Tooltip>
+                              </ListItemSecondaryAction>
+                          </ListItem>
+                      </motion.div>
+                    ))}
+                  </List>
+                ) : (
+                  <Box sx={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    mt: 4, 
+                    mb: 2,
+                    minHeight: '200px'
+                  }}>
+                    <FavoriteIcon sx={{ fontSize: 60, color: 'text.secondary', mb: 2, opacity: 0.5 }} />
+                    <Typography sx={{ textAlign: 'center', color: 'text.secondary' }}>
+                      Henüz favori terapistiniz bulunmuyor.
+                    </Typography>
+                  </Box>
+                )}
+              </Paper>
+            </Grid>
+          )}
         </Grid>
 
         <Snackbar open={notification.open} autoHideDuration={6000} onClose={handleNotificationClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>

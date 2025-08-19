@@ -18,6 +18,9 @@ namespace WebApplication1.Api.Services
         Task<AuthResponse> ResetPasswordAsync(ResetPasswordRequest request);
         Task<AuthResponse> VerifyEmailAsync(VerifyEmailRequest request);
         Task<UserDto?> GetUserProfileAsync(int userId);
+        Task<AuthResponse> AddFavoriteTherapistAsync(int userId, int therapistId);
+        Task<AuthResponse> RemoveFavoriteTherapistAsync(int userId, int therapistId);
+        Task<AuthResponse> GetFavoriteTherapistsAsync(int userId);
     }
 
     public class AuthService : IAuthService
@@ -419,6 +422,148 @@ namespace WebApplication1.Api.Services
 </html>";
 
             await _emailService.SendEmailAsync(email, subject, htmlBody);
+        }
+
+        public async Task<AuthResponse> AddFavoriteTherapistAsync(int userId, int therapistId)
+        {
+            try
+            {
+                // Kullanıcı ve terapist kontrolü
+                var user = await _context.Users.FindAsync(userId);
+                var therapist = await _context.Therapists.FindAsync(therapistId);
+
+                if (user == null)
+                {
+                    return new AuthResponse { Success = false, Message = "Kullanıcı bulunamadı." };
+                }
+
+                // Sadece Customer rolündeki kullanıcılar favori ekleyebilir
+                if (user.Role != UserRole.Customer)
+                {
+                    return new AuthResponse { Success = false, Message = "Sadece müşteriler favori terapist ekleyebilir." };
+                }
+
+                if (therapist == null)
+                {
+                    return new AuthResponse { Success = false, Message = "Terapist bulunamadı." };
+                }
+
+                // Zaten favori mi kontrol et
+                var existingFavorite = await _context.UserFavoriteTherapists
+                    .FirstOrDefaultAsync(f => f.UserId == userId && f.TherapistId == therapistId);
+
+                if (existingFavorite != null)
+                {
+                    return new AuthResponse { Success = false, Message = "Bu terapist zaten favorilerinizde." };
+                }
+
+                // Yeni favori ekle
+                var favorite = new UserFavoriteTherapist
+                {
+                    UserId = userId,
+                    TherapistId = therapistId,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _context.UserFavoriteTherapists.Add(favorite);
+                await _context.SaveChangesAsync();
+
+                return new AuthResponse
+                {
+                    Success = true,
+                    Message = "Terapist favorilere eklendi."
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Favori terapist eklenirken hata oluştu");
+                return new AuthResponse { Success = false, Message = "Favori eklenirken bir hata oluştu." };
+            }
+        }
+
+        public async Task<AuthResponse> RemoveFavoriteTherapistAsync(int userId, int therapistId)
+        {
+            try
+            {
+                // Kullanıcı kontrolü
+                var user = await _context.Users.FindAsync(userId);
+                if (user == null)
+                {
+                    return new AuthResponse { Success = false, Message = "Kullanıcı bulunamadı." };
+                }
+
+                // Sadece Customer rolündeki kullanıcılar favori kaldırabilir
+                if (user.Role != UserRole.Customer)
+                {
+                    return new AuthResponse { Success = false, Message = "Sadece müşteriler favori terapist kaldırabilir." };
+                }
+
+                var favorite = await _context.UserFavoriteTherapists
+                    .FirstOrDefaultAsync(f => f.UserId == userId && f.TherapistId == therapistId);
+
+                if (favorite == null)
+                {
+                    return new AuthResponse { Success = false, Message = "Bu terapist favorilerinizde bulunamadı." };
+                }
+
+                _context.UserFavoriteTherapists.Remove(favorite);
+                await _context.SaveChangesAsync();
+
+                return new AuthResponse
+                {
+                    Success = true,
+                    Message = "Terapist favorilerden kaldırıldı."
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Favori terapist kaldırılırken hata oluştu");
+                return new AuthResponse { Success = false, Message = "Favori kaldırılırken bir hata oluştu." };
+            }
+        }
+
+        public async Task<AuthResponse> GetFavoriteTherapistsAsync(int userId)
+        {
+            try
+            {
+                var user = await _context.Users
+                    .Include(u => u.FavoriteTherapists)
+                    .ThenInclude(ft => ft.Therapist)
+                    .FirstOrDefaultAsync(u => u.Id == userId);
+
+                if (user == null)
+                {
+                    return new AuthResponse { Success = false, Message = "Kullanıcı bulunamadı." };
+                }
+
+                // Sadece Customer rolündeki kullanıcılar favori terapistlerini görebilir
+                if (user.Role != UserRole.Customer)
+                {
+                    return new AuthResponse { Success = false, Message = "Sadece müşteriler favori terapistlerini görebilir." };
+                }
+
+                var favoriteTherapists = user.FavoriteTherapists
+                    .Select(ft => new
+                    {
+                        Id = ft.Therapist.Id,
+                        Name = ft.Therapist.Name,
+                        Bio = ft.Therapist.Bio,
+                        ProfileImageUrl = ft.Therapist.ProfilePictureUrl
+                    })
+                    .ToList();
+
+                return new AuthResponse
+                {
+                    Success = true,
+                    Message = "Favori terapistler başarıyla getirildi.",
+                    FavoriteTherapists = favoriteTherapists
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Favori terapistler getirilirken hata oluştu");
+                return new AuthResponse { Success = false, Message = "Favori terapistler getirilirken bir hata oluştu." };
+            }
         }
     }
 } 

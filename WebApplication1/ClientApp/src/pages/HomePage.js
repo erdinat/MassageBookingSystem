@@ -320,7 +320,7 @@ function HomePage() {
       <Box sx={{ position: 'relative' }}>
         {/* Slider Section */}
         <AnimatedSection ref={galleryRef}>
-          <Box sx={{ py: 6, backgroundColor: 'rgba(245, 241, 232, 0.3)' }}>
+          <Box sx={{ py: 6 }}>
             <Container>
               <Typography variant="h4" component="h2" align="center" gutterBottom sx={{ 
                 color: '#8B6F47', 
@@ -331,7 +331,7 @@ function HomePage() {
               </Typography>
               
               <Box 
-                sx={{ position: 'relative', height: '400px', borderRadius: 2, overflow: 'hidden', boxShadow: 4 }}
+                sx={{ position: 'relative', height: '400px', borderRadius: 2, overflow: 'hidden' }}
                 onMouseEnter={() => setIsHovering(true)}
                 onMouseLeave={() => setIsHovering(false)}
               >
@@ -639,9 +639,10 @@ function HomePage() {
                               <CardContent>
                                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                                   <Avatar 
+                                    src={therapist.profileImageUrl ? `/images/therapists/${therapist.profileImageUrl}` : undefined}
                                     sx={{ 
-                                      width: 50, 
-                                      height: 50, 
+                                      width: 80, 
+                                      height: 80, 
                                       mr: 2, 
                                       backgroundColor: '#8B6F47' 
                                     }}

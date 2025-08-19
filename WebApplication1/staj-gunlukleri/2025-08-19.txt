@@ -1,0 +1,278 @@
+STAJ GÜNLÜĞÜ
+Tarih: 19 Ağustos 2025 (Salı)
+Saat: 09:00 - 17:00
+
+Bugün Yapılan İşler:
+
+1. Proje Final Sunumu Hazırlığı
+   - Proje özeti ve özelliklerin derlenmesi
+   - Sunum materyallerinin hazırlanması
+   - Demo senaryolarının planlanması
+   - Teknik detayların dokümante edilmesi
+
+   Proje özeti hazırlandı:
+   - L'OR Masaj Merkezi Randevu Sistemi
+   - Full-stack web uygulaması
+   - ASP.NET Core Web API + React.js
+   - SQL Server veritabanı
+   - JWT Authentication sistemi
+   - Email bildirim sistemi
+
+2. Proje Dokümantasyonu Tamamlama
+   - API endpoint'lerinin tam listesi
+   - Database şeması ve ilişkiler
+   - Kullanıcı kılavuzu hazırlama
+   - Teknik dokümantasyon güncellemesi
+   - Deployment talimatları
+
+   API Endpoint Listesi:
+   ```
+   Authentication:
+   POST /api/auth/register - Kullanıcı kaydı
+   POST /api/auth/login - Kullanıcı girişi
+   POST /api/auth/forgot-password - Şifre sıfırlama
+   POST /api/auth/reset-password - Şifre değiştirme
+   POST /api/auth/verify-email - Email doğrulama
+   GET /api/auth/profile/{userId} - Profil bilgileri
+   
+   Appointments:
+   GET /api/appointments - Tüm randevular
+   POST /api/appointments - Randevu oluşturma
+   PUT /api/appointments/{id} - Randevu güncelleme
+   DELETE /api/appointments/{id} - Randevu silme
+   
+   Services:
+   GET /api/services - Tüm hizmetler
+   POST /api/services - Hizmet ekleme
+   PUT /api/services/{id} - Hizmet güncelleme
+   DELETE /api/services/{id} - Hizmet silme
+   
+   Therapists:
+   GET /api/therapists - Tüm terapistler
+   POST /api/therapists - Terapist ekleme
+   PUT /api/therapists/{id} - Terapist güncelleme
+   DELETE /api/therapists/{id} - Terapist silme
+   
+   Availability:
+   GET /api/availability - Müsaitlik durumları
+   POST /api/availability - Müsaitlik ekleme
+   PUT /api/availability/{id} - Müsaitlik güncelleme
+   DELETE /api/availability/{id} - Müsaitlik silme
+   ```
+
+3. Kod Review ve Optimizasyon
+   - Kod kalitesi kontrolü
+   - Performance optimizasyonları
+   - Memory leak kontrolü
+   - Security audit
+   - Code refactoring
+
+   Database şeması kontrolü:
+   ```sql
+   -- Ana tablolar
+   Users (Id, Name, Email, PasswordHash, Role, CreatedAt, LastLoginAt)
+   Customers (Id, Name, Surname, Email, Phone)
+   Therapists (Id, Name, Bio, ProfilePictureUrl, UserId)
+   Services (Id, Name, Description, Price, DurationMinutes)
+   AvailabilitySlots (Id, TherapistId, StartTime, EndTime, IsBooked)
+   Appointments (Id, CustomerId, TherapistId, ServiceId, AvailabilitySlotId, CreatedAt)
+   
+   -- İlişkiler
+   Users -> Therapists (1:1)
+   Users -> Customers (1:1)
+   Therapists -> AvailabilitySlots (1:N)
+   Services -> Appointments (1:N)
+   Customers -> Appointments (1:N)
+   ```
+
+4. Test Senaryoları ve QA
+   - End-to-end test senaryoları
+   - User acceptance testing
+   - Cross-browser testing
+   - Mobile responsiveness test
+   - Performance testing
+
+   Test senaryoları:
+   ```
+   1. Kullanıcı Kayıt ve Giriş
+      - Yeni kullanıcı kaydı
+      - Email doğrulama
+      - Giriş yapma
+      - Şifre sıfırlama
+   
+   2. Randevu Sistemi
+      - Hizmet seçimi
+      - Terapist seçimi
+      - Tarih/saat seçimi
+      - Randevu oluşturma
+      - Randevu güncelleme
+      - Randevu iptal etme
+   
+   3. Admin Paneli
+      - Hizmet yönetimi
+      - Terapist yönetimi
+      - Randevu görüntüleme
+      - Müsaitlik yönetimi
+   
+   4. Terapist Paneli
+      - Müsaitlik ekleme
+      - Randevu görüntüleme
+      - Profil yönetimi
+   ```
+
+5. Proje Teslimi Hazırlığı
+   - Source code organizasyonu
+   - Git repository temizliği
+   - README dosyası güncellemesi
+   - Environment setup talimatları
+   - Backup ve recovery planı
+
+   README.md güncellemesi:
+   ```markdown
+   # L'OR Masaj Merkezi Randevu Sistemi
+   
+   ## Teknolojiler
+   - Backend: ASP.NET Core Web API
+   - Frontend: React.js + Material-UI
+   - Database: SQL Server
+   - Authentication: JWT
+   - Email: SMTP (MailKit)
+   
+   ## Kurulum
+   1. Backend: `dotnet run`
+   2. Frontend: `npm start`
+   3. Database: `dotnet ef database update`
+   
+   ## Özellikler
+   - Kullanıcı kayıt/giriş sistemi
+   - Randevu oluşturma ve yönetimi
+   - Email bildirimleri
+   - Admin paneli
+   - Terapist paneli
+   - Responsive tasarım
+   ```
+
+6. **FINAL SUNUM VE DEĞERLENDİRME (14:00-16:00)**
+   - Mentor Hüseyin Çobanoğlu ile final sunum
+   - Proje demo gösterimi
+   - Teknik detayların açıklanması
+   - Soru-cevap bölümü
+   - Proje değerlendirmesi
+
+   Sunum içeriği:
+   ```
+   1. Proje Tanıtımı (10 dk)
+      - L'OR Masaj Merkezi Randevu Sistemi
+      - Proje hedefleri ve kapsamı
+      - Kullanılan teknolojiler
+   
+   2. Teknik Mimari (15 dk)
+      - Backend: ASP.NET Core Web API
+      - Frontend: React.js + Material-UI
+      - Database: SQL Server + Entity Framework
+      - Authentication: JWT
+      - Email: SMTP + MailKit
+   
+   3. Demo Gösterimi (20 dk)
+      - Kullanıcı kayıt ve giriş
+      - Randevu oluşturma süreci
+      - Admin paneli fonksiyonları
+      - Terapist paneli
+      - Email bildirimleri
+   
+   4. Kod Örnekleri (10 dk)
+      - API Controller örnekleri
+      - React component yapısı
+      - Database ilişkileri
+      - Authentication flow
+   
+   5. Öğrenilen Konular (10 dk)
+      - Full-stack development
+      - API design patterns
+      - Database design
+      - Security best practices
+      - Project management
+   
+   6. Soru-Cevap (15 dk)
+   ```
+
+7. **MENTOR DEĞERLENDİRMESİ (16:00-17:00)**
+   - Proje başarı kriterlerinin değerlendirilmesi
+   - Öğrenilen teknolojilerin gözden geçirilmesi
+   - Gelecek geliştirme önerileri
+   - Staj deneyimi değerlendirmesi
+   - Sertifika ve referans hazırlığı
+
+   Mentor değerlendirme kriterleri:
+   ```
+   ✅ Teknik Beceriler (40%)
+   - ASP.NET Core Web API geliştirme
+   - React.js frontend development
+   - SQL Server database yönetimi
+   - JWT authentication implementasyonu
+   
+   ✅ Proje Yönetimi (30%)
+   - Zaman yönetimi
+   - Problem çözme becerisi
+   - Dokümantasyon
+   - Kod kalitesi
+   
+   ✅ Öğrenme ve Gelişim (20%)
+   - Yeni teknolojileri öğrenme
+   - Hata ayıklama becerisi
+   - Adaptasyon yeteneği
+   
+   ✅ İletişim ve Takım Çalışması (10%)
+   - Mentor ile iletişim
+   - Proje sunumu
+   - Soru sorma ve öğrenme
+   ```
+
+Kullanılan Teknolojiler:
+- ASP.NET Core Web API
+- Entity Framework Core
+- SQL Server
+- React.js
+- Material-UI
+- JWT Authentication
+- MailKit (SMTP)
+- Git Version Control
+- Visual Studio Code
+
+Öğrenilen Konular:
+- Full-stack web development
+- Database design and management
+- API development best practices
+- Frontend-backend integration
+- Project management and documentation
+- Version control with Git
+- Email service integration
+- Security implementation
+- User experience design
+- Testing and quality assurance
+
+Staj Süresi Özeti:
+- Toplam çalışma günü: 25 gün
+- Başlangıç: 16 Temmuz 2025
+- Bitiş: 19 Ağustos 2025
+- Tamamlanan proje: L'OR Masaj Merkezi Randevu Sistemi
+
+Proje Başarıyla Tamamlandı:
+✅ Kullanıcı kayıt ve giriş sistemi
+✅ Randevu oluşturma ve yönetimi
+✅ Terapist ve hizmet yönetimi
+✅ Email bildirim sistemi
+✅ Admin paneli
+✅ Responsive web tasarımı
+✅ Güvenli authentication sistemi
+✅ Password reset fonksiyonalitesi
+✅ Email verification sistemi
+✅ CORS ve güvenlik konfigürasyonu
+
+**Final Sunum Sonucu: BAŞARILI ✅**
+- Mentor değerlendirmesi: Olumlu
+- Proje hedefleri: %100 tamamlandı
+- Teknik beceriler: Geliştirildi
+- Gelecek önerileri: Alındı
+
+İmza: _________________
